@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redline | Minecraft Server</title>
+    
+    <!-- Шрифты Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'redline-red': '#C4001D',
+                        'dark-bg': '#111111',
+                        'dark-gray': '#1F1F1F',
+                        'light-gray': '#D1D5DB',
+                    },
+                    fontFamily: {
+                        montserrat: ['Montserrat', 'sans-serif'],
+                        'open-sans': ['Open Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Open Sans', sans-serif; overflow-x: hidden; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+
+        /* --- ДИНАМИЧЕСКИЙ ФОН HERO --- */
+        .hero-background {
+            background-image: linear-gradient(rgba(245, 245, 245, 0.9), rgba(255, 255, 255, 0.95)), url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-attachment: fixed;
+            background-size: auto;
+            background-position: center;
+            background-color: #f9f9f9;
+            transition: all 0.5s ease;
+        }
+
+        .dark .hero-background {
+            background-image: linear-gradient(rgba(17, 17, 17, 0.85), rgba(17, 17, 17, 0.95)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            background-color: #0a0a0a;
+        }
+
+        /* --- СИСТЕМА ЛИНИЙ --- */
+        .animated-lines {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .animated-lines::before, .animated-lines::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 250%;
+            background: linear-gradient(transparent, #C4001D, transparent);
+            top: -75%;
+            box-shadow: 0 0 15px rgba(196, 0, 29, 0.4); /* Мягкая тень для светлой темы */
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: box-shadow 0.5s ease;
+        }
+
+        .dark .animated-lines::before, .dark .animated-lines::after {
+            box-shadow: 0 0 20px #C4001D, 0 0 40px rgba(196, 0, 29, 0.8);
+        }
+
+        /* Анимации появления и движения */
+        .animated-lines.initial-state::before { animation: enterLeft 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .animated-lines.initial-state::after { animation: enterRight 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .animated-lines.loop-state::before { opacity: 1; animation: breatheLeft 12s ease-in-out infinite; }
+        .animated-lines.loop-state::after { opacity: 1; animation: breatheRight 12s ease-in-out infinite; }
+
+        @keyframes enterLeft { 0% { left: -50%; opacity: 0; } 100% { left: 10%; opacity: 1; } }
+        @keyframes enterRight { 0% { left: 150%; opacity: 0; } 100% { left: 90%; opacity: 1; } }
+        @keyframes breatheLeft { 0%, 100% { left: 10%; } 50% { left: 35%; } }
+        @keyframes breatheRight { 0%, 100% { left: 90%; } 50% { left: 65%; } }
+
+        /* --- ЭФФЕКТ БЛИКА НА КНОПКЕ --- */
+        .shimmer-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: skewX(-20deg);
+            animation: shimmer 4s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            20% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        /* Утилиты видео */
+        .aspect-w-16 { position: relative; padding-bottom: 56.25%; }
+        .aspect-w-16 iframe { position: absolute; height: 100%; width: 100%; top: 0; left: 0; }
+
+        @media (max-width: 768px) { .animated-lines { display: none; } }
+    </style>
+</head>
+<body class="bg-white dark:bg-dark-bg text-gray-900 dark:text-white transition-colors duration-500">
+
+    <!-- Навигация -->
+    <nav class="fixed w-full z-50 bg-white/70 dark:bg-dark-bg/70 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 transition-all">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-black text-redline-red tracking-tighter">REDLINE</div>
+            
+            <div class="hidden md:flex items-center space-x-8 text-sm font-bold">
+                <a href="#features" class="hover:text-redline-red transition">О СЕРВЕРЕ</a>
+                <a href="#how-to" class="hover:text-redline-red transition">КАК ИГРАТЬ</a>
+                <a href="#map" class="hover:text-redline-red transition">КАРТА</a>
+                
+                <button id="theme-toggle" class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:scale-110 transition">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"></path></svg>
+                </button>
+            </div>
+
+            <button id="mobile-menu-button" class="md:hidden p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative h-screen flex items-center justify-center text-center overflow-hidden hero-background">
+        <div id="lines-container" class="animated-lines initial-state"></div>
+
+        <div class="relative z-10 px-4 mt-16 animate-fade-in">
+            <h1 class="text-4xl md:text-6xl font-bold mb-2">Мир без границ и вайпов</h1>
+            <p class="text-7xl md:text-9xl font-black tracking-tighter text-redline-red my-4 drop-shadow-2xl">REDLINE</p>
+            
+            <div class="inline-flex items-center bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-full px-6 py-2 mb-8 border border-white/20 dark:border-gray-700/50">
+                <span id="status-dot" class="w-3 h-3 bg-gray-400 rounded-full mr-3"></span>
+                <span class="font-mono text-sm tracking-widest uppercase">
+                    Онлайн: <span id="online-count" class="font-bold">-</span> / 500
+                </span>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                <button onclick="copyIP()" class="shimmer-btn group bg-redline-red text-white font-black py-5 px-12 rounded-xl hover:shadow-[0_0_30px_rgba(196,0,29,0.5)] transition-all duration-300 flex items-center active:scale-95">
+                    <span id="ip-text">PLAY.REDLINE.GG</span>
+                </button>
+                <a href="#discord" class="bg-white dark:bg-white/5 text-gray-900 dark:text-white font-bold py-5 px-12 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 transition-all active:scale-95">
+                    НАШ DISCORD
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Преимущества -->
+    <section id="features" class="py-32 bg-gray-50 dark:bg-dark-gray transition-colors">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-black uppercase tracking-tight">Почему мы?</h2>
+                <div class="w-20 h-1.5 bg-redline-red mx-auto mt-4"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-6">
+                <!-- Каждой карточке добавлен hover:scale-105 -->
+                <div class="group p-10 bg-white dark:bg-dark-bg rounded-3xl border border-gray-200 dark:border-gray-800 transition-all hover:scale-105 hover:border-redline-red">
+                    <div class="w-14 h-14 bg-redline-red/10 rounded-2xl flex items-center justify-center mb-6 text-redline-red group-hover:bg-redline-red group-hover:text-white transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">БЕЗ ВАЙПОВ</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Мы ценим ваше время. Ваши постройки останутся в истории сервера навсегда.</p>
+                </div>
+
+                <div class="group p-10 bg-white dark:bg-dark-bg rounded-3xl border border-gray-200 dark:border-gray-800 transition-all hover:scale-105 hover:border-redline-red">
+                    <div class="w-14 h-14 bg-redline-red/10 rounded-2xl flex items-center justify-center mb-6 text-redline-red group-hover:bg-redline-red group-hover:text-white transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">СТАБИЛЬНОСТЬ</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Ryzen 9 и оптимизированное ядро выдают честные 20 TPS при любом онлайне.</p>
+                </div>
+
+                <div class="group p-10 bg-white dark:bg-dark-bg rounded-3xl border border-gray-200 dark:border-gray-800 transition-all hover:scale-105 hover:border-redline-red">
+                    <div class="w-14 h-14 bg-redline-red/10 rounded-2xl flex items-center justify-center mb-6 text-redline-red group-hover:bg-redline-red group-hover:text-white transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">ЭКОНОМИКА</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Живая торговля между игроками, аукционы и уникальная система банков.</p>
+                </div>
+
+                <div class="group p-10 bg-white dark:bg-dark-bg rounded-3xl border border-gray-200 dark:border-gray-800 transition-all hover:scale-105 hover:border-redline-red">
+                    <div class="w-14 h-14 bg-redline-red/10 rounded-2xl flex items-center justify-center mb-6 text-redline-red group-hover:bg-redline-red group-hover:text-white transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">КОМЬЮНИТИ</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Средний возраст игроков 18+. Модерация работает 24/7 без выходных.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- КАК НАЧАТЬ ИГРАТЬ -->
+    <section id="how-to" class="py-24 bg-white dark:bg-dark-bg transition-colors">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-16">
+                <div class="md:w-1/2">
+                    <h2 class="text-4xl font-black mb-6 italic uppercase">Как начать играть?</h2>
+                    <div class="space-y-8">
+                        <div class="flex items-start gap-4">
+                            <span class="bg-redline-red text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0">1</span>
+                            <div>
+                                <h4 class="font-bold text-lg">Запусти Minecraft</h4>
+                                <p class="text-gray-500 text-sm">Используй версию 1.20.1 или выше (рекомендуем Fabric + Iris для графики).</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="bg-redline-red text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0">2</span>
+                            <div>
+                                <h4 class="font-bold text-lg">Добавь сервер</h4>
+                                <p class="text-gray-500 text-sm">Вставь адрес <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">play.redline.gg</code> в список серверов.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <span class="bg-redline-red text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0">3</span>
+                            <div>
+                                <h4 class="font-bold text-lg">Врывайся в игру</h4>
+                                <p class="text-gray-500 text-sm">Проходи регистрацию прямо на сервере и начинай выживание!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 w-full">
+                    <div class="aspect-w-16 rounded-3xl overflow-hidden border-8 border-gray-100 dark:border-gray-800 shadow-2xl">
+                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Trailer" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Карта -->
+    <section id="map" class="py-24 bg-gray-50 dark:bg-dark-gray transition-colors">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-black mb-4">ЖИВАЯ 3D КАРТА</h2>
+            <p class="text-gray-500 mb-12 max-w-xl mx-auto">Следи за миром в реальном времени. Найди свой дом или разведай новые территории прямо в браузере.</p>
+            <div class="h-[500px] w-full bg-gray-200 dark:bg-gray-800 rounded-3xl flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-inner overflow-hidden relative group">
+                <!-- Заглушка для карты -->
+                <div class="absolute inset-0 bg-cover bg-center filter blur-sm opacity-50 transition group-hover:scale-105" style="background-image: url('https://files.catbox.moe/k2hsm4.jpg');"></div>
+                <a href="#" class="relative z-10 bg-redline-red text-white font-bold py-4 px-10 rounded-xl hover:scale-110 transition shadow-xl">ОТКРЫТЬ КАРТУ В НОВОЙ ВКЛАДКЕ</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-dark-bg border-t border-gray-200 dark:border-gray-800 py-16 transition-colors">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div>
+                <span class="text-3xl font-black text-redline-red tracking-tighter">REDLINE</span>
+                <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Premium Survival Experience © 2026</p>
+            </div>
+            <div class="flex space-x-8 text-sm font-bold uppercase tracking-widest">
+                <a href="#" class="hover:text-redline-red transition">Правила</a>
+                <a href="#" class="hover:text-redline-red transition">Вики</a>
+                <a href="#" class="hover:text-redline-red transition">Донат</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Анимация линий
+            const lines = document.getElementById('lines-container');
+            setTimeout(() => {
+                lines.classList.remove('initial-state');
+                lines.classList.add('loop-state');
+            }, 1500);
+
+            // Тема
+            const themeBtn = document.getElementById('theme-toggle');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                lightIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                darkIcon.classList.remove('hidden');
+            }
+
+            themeBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                darkIcon.classList.toggle('hidden');
+                lightIcon.classList.toggle('hidden');
+                localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            });
+
+            // Копирование IP
+            window.copyIP = function() {
+                const ip = "play.redline.gg";
+                navigator.clipboard.writeText(ip).then(() => {
+                    const el = document.getElementById('ip-text');
+                    const original = el.innerText;
+                    el.innerText = "IP СКОПИРОВАН!";
+                    setTimeout(() => el.innerText = original, 2000);
+                });
+            }
+
+            // Статус (Fetch API)
+            async function updateStatus() {
+                const count = document.getElementById('online-count');
+                const dot = document.getElementById('status-dot');
+                try {
+                    const res = await fetch('/api/status');
+                    const data = await res.json();
+                    if (data.online) {
+                        count.innerText = data.players;
+                        dot.className = "w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse shadow-[0_0_10px_#22c55e]";
+                    } else {
+                        count.innerText = "OFF";
+                        dot.className = "w-3 h-3 bg-red-500 rounded-full mr-3";
+                    }
+                } catch {
+                    count.innerText = "?";
+                }
+            }
+            updateStatus();
+            setInterval(updateStatus, 15000);
+        });
+    </script>
+</body>
+</html>
