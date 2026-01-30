@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redline | Minecraft Server</title>
     
-    <!-- Шрифты Google -->
+    <!-- SEO & Meta Tags -->
+    <title>Redline | 37.9.13.223</title>
+    <meta name="description" content="Redline - классическое выживание без вайпов на мощном железе.">
+    <meta property="og:title" content="Redline Minecraft Server">
+    <meta property="og:image" content="https://files.catbox.moe/k2hsm4.jpg">
+    <meta name="theme-color" content="#C4001D">
+
+    <!-- Шрифты -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
+    <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -20,9 +26,8 @@
                 extend: {
                     colors: {
                         'redline-red': '#C4001D',
-                        'dark-bg': '#111111',
-                        'dark-gray': '#1F1F1F',
-                        'light-gray': '#D1D5DB',
+                        'dark-bg': '#0a0a0a',
+                        'dark-gray': '#121212',
                     },
                     fontFamily: {
                         montserrat: ['Montserrat', 'sans-serif'],
@@ -35,30 +40,15 @@
 
     <style>
         body { font-family: 'Open Sans', sans-serif; overflow-x: hidden; }
-        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; }
 
-        /* --- ДИНАМИЧЕСКИЙ ФОН HERO --- */
-        .hero-background {
-            background-image: linear-gradient(rgba(245, 245, 245, 0.9), rgba(255, 255, 255, 0.95)), url('https://www.transparenttextures.com/patterns/cubes.png');
-            background-attachment: fixed;
-            background-size: auto;
-            background-position: center;
-            background-color: #f9f9f9;
-            transition: all 0.5s ease;
-        }
-
-        .dark .hero-background {
-            background-image: linear-gradient(rgba(17, 17, 17, 0.85), rgba(17, 17, 17, 0.95)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
-            background-color: #0a0a0a;
-        }
-
-        /* --- СИСТЕМА ЛИНИЙ --- */
+        /* --- КРАСНЫЕ ЛИНИИ (САМЫЙ НИЖНИЙ СЛОЙ) --- */
         .animated-lines {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%;
             pointer-events: none;
-            z-index: 0;
+            z-index: 1; /* Линии под волной */
             overflow: hidden;
         }
 
@@ -69,19 +59,17 @@
             height: 250%;
             background: linear-gradient(transparent, #C4001D, transparent);
             top: -75%;
-            box-shadow: 0 0 15px rgba(196, 0, 29, 0.4); /* Мягкая тень для светлой темы */
             transform: rotate(45deg);
             opacity: 0;
             transition: box-shadow 0.5s ease;
         }
 
-        .dark .animated-lines::before, .dark .animated-lines::after {
-            box-shadow: 0 0 20px #C4001D, 0 0 40px rgba(196, 0, 29, 0.8);
-        }
+        .animated-lines::before, .animated-lines::after { box-shadow: 0 0 15px rgba(196, 0, 29, 0.4); }
+        .dark .animated-lines::before, .dark .animated-lines::after { box-shadow: 0 0 20px #C4001D, 0 0 40px rgba(196, 0, 29, 0.8); }
 
-        /* Анимации появления и движения */
         .animated-lines.initial-state::before { animation: enterLeft 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         .animated-lines.initial-state::after { animation: enterRight 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
         .animated-lines.loop-state::before { opacity: 1; animation: breatheLeft 12s ease-in-out infinite; }
         .animated-lines.loop-state::after { opacity: 1; animation: breatheRight 12s ease-in-out infinite; }
 
@@ -90,255 +78,317 @@
         @keyframes breatheLeft { 0%, 100% { left: 10%; } 50% { left: 35%; } }
         @keyframes breatheRight { 0%, 100% { left: 90%; } 50% { left: 65%; } }
 
-        /* --- ЭФФЕКТ БЛИКА НА КНОПКЕ --- */
-        .shimmer-btn {
-            position: relative;
-            overflow: hidden;
+        /* --- HERO (ФОН СВЕТЛОЙ ТЕМЫ ЧУТЬ ТЕМНЕЕ) --- */
+        .hero-background {
+            /* Сделали rgba(230, 230, 230) вместо 245 для чуть более темного фона */
+            background-image: linear-gradient(rgba(230, 230, 230, 0.9), rgba(245, 245, 245, 0.98)), url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-attachment: fixed;
         }
-        .shimmer-btn::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: skewX(-20deg);
-            animation: shimmer 4s infinite;
-        }
-        @keyframes shimmer {
-            0% { left: -100%; }
-            20% { left: 150%; }
-            100% { left: 150%; }
+        .dark .hero-background {
+            background-image: linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.98)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
         }
 
-        /* Утилиты видео */
-        .aspect-w-16 { position: relative; padding-bottom: 56.25%; }
-        .aspect-w-16 iframe { position: absolute; height: 100%; width: 100%; top: 0; left: 0; }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .skeleton {
+            background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .shimmer-btn { position: relative; overflow: hidden; }
+        .shimmer-btn::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: skewX(-20deg); animation: shimmer 4s infinite;
+        }
+        @keyframes shimmer { 0% { left: -100%; } 20% { left: 150%; } 100% { left: 150%; } }
+
+        /* --- АНИМАЦИЯ ВОЛНЫ (СРЕДНИЙ СЛОЙ) --- */
+        .waves {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100px;
+            z-index: 10; /* Поверх линий */
+            pointer-events: none;
+        }
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
+        
+        @keyframes move-forever {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
+        }
 
         @media (max-width: 768px) { .animated-lines { display: none; } }
     </style>
 </head>
-<body class="bg-white dark:bg-dark-bg text-gray-900 dark:text-white transition-colors duration-500">
+<body class="bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 transition-colors duration-500">
 
     <!-- Навигация -->
-    <nav class="fixed w-full z-50 bg-white/70 dark:bg-dark-bg/70 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 transition-all">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-2xl font-black text-redline-red tracking-tighter">REDLINE</div>
+    <nav class="fixed w-full z-[100] bg-white/80 dark:bg-dark-bg/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center relative z-[110]">
+            <a href="#" class="text-2xl font-black text-redline-red tracking-tighter hover:scale-105 transition uppercase relative z-[101]">Redline</a>
             
-            <div class="hidden md:flex items-center space-x-8 text-sm font-bold">
-                <a href="#features" class="hover:text-redline-red transition">О СЕРВЕРЕ</a>
-                <a href="#how-to" class="hover:text-redline-red transition">КАК ИГРАТЬ</a>
-                <a href="#map" class="hover:text-redline-red transition">КАРТА</a>
+            <div class="hidden md:flex items-center space-x-10 text-xs font-black uppercase tracking-widest relative z-[101]">
+                <a href="#admin" class="hover:text-redline-red transition cursor-pointer">Администрация</a>
+                <a href="javascript:void(0)" onclick="toggleModal('rules-modal')" class="hover:text-redline-red transition cursor-pointer">Правила</a>
+                <a href="http://37.9.13.223:30471/#world:0:0:0:1500:0:0:0:0:perspective" target="_blank" class="hover:text-redline-red transition cursor-pointer">Карта</a>
                 
-                <button id="theme-toggle" class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:scale-110 transition">
+                <button id="theme-toggle" class="p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:rotate-12 transition">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0z"></path></svg>
                 </button>
             </div>
-
-            <button id="mobile-menu-button" class="md:hidden p-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="hero" class="relative h-screen flex items-center justify-center text-center overflow-hidden hero-background">
+    <section class="relative h-screen flex items-center justify-center text-center overflow-hidden hero-background">
+        <!-- КРАСНЫЕ ЛИНИИ (z-index: 1) -->
         <div id="lines-container" class="animated-lines initial-state"></div>
 
-        <div class="relative z-10 px-4 mt-16 animate-fade-in">
-            <h1 class="text-4xl md:text-6xl font-bold mb-2">Мир без границ и вайпов</h1>
-            <p class="text-7xl md:text-9xl font-black tracking-tighter text-redline-red my-4 drop-shadow-2xl">REDLINE</p>
+        <!-- КОНТЕНТ (z-index: 20) -->
+        <div class="relative z-20 px-4 mt-16 pointer-events-auto">
+            <div class="inline-block mb-4 px-4 py-1 border border-redline-red text-redline-red text-[10px] font-black uppercase tracking-[0.3em] rounded-full">
+                Season 1: No Wipe
+            </div>
+            <h1 class="text-5xl md:text-8xl font-black mb-4 tracking-tighter uppercase">Твоя история <br> <span class="text-redline-red">без границ</span></h1>
             
-            <div class="inline-flex items-center bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-full px-6 py-2 mb-8 border border-white/20 dark:border-gray-700/50">
-                <span id="status-dot" class="w-3 h-3 bg-gray-400 rounded-full mr-3"></span>
-                <span class="font-mono text-sm tracking-widest uppercase">
-                    Онлайн: <span id="online-count" class="font-bold">-</span> / 500
-                </span>
+            <div class="flex items-center justify-center gap-3 mb-12">
+                <div id="status-dot" class="w-2.5 h-2.5 bg-gray-500 rounded-full"></div>
+                <div id="online-wrapper" class="font-mono text-sm tracking-widest uppercase">
+                    <span id="online-count" class="skeleton px-6 py-1 rounded-md text-transparent">-</span> 
+                    <span class="opacity-50">/ 500 Online</span>
+                </div>
             </div>
 
-            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
-                <button onclick="copyIP()" class="shimmer-btn group bg-redline-red text-white font-black py-5 px-12 rounded-xl hover:shadow-[0_0_30px_rgba(196,0,29,0.5)] transition-all duration-300 flex items-center active:scale-95">
-                    <span id="ip-text">PLAY.REDLINE.GG</span>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6 relative z-50 pointer-events-auto">
+                <button onclick="copyIP()" 
+                        class="shimmer-btn group relative flex items-center justify-center w-full md:w-80 h-24 bg-redline-red text-white rounded-3xl shadow-[0_20px_50px_rgba(196,0,29,0.3)] hover:shadow-[0_25px_60px_rgba(196,0,29,0.5)] transition-all duration-500 hover:-translate-y-2 active:scale-95 cursor-pointer z-50">
+                    <div class="flex items-center gap-4">
+                        <span id="ip-text" class="text-lg font-black uppercase tracking-[0.2em]">Копировать IP</span>
+                        <svg class="w-6 h-6 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </div>
                 </button>
-                <a href="#discord" class="bg-white dark:bg-white/5 text-gray-900 dark:text-white font-bold py-5 px-12 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 transition-all active:scale-95">
-                    НАШ DISCORD
+                
+                <a href="http://37.9.13.223:30471/#world:0:0:0:1500:0:0:0:0:perspective" target="_blank" 
+                   class="group relative flex items-center justify-center w-full md:w-80 h-24 bg-white/5 dark:bg-white/5 backdrop-blur-md border border-gray-300 dark:border-white/10 rounded-3xl hover:border-redline-red/50 hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 active:scale-95 cursor-pointer z-50 overflow-hidden">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black uppercase tracking-[0.2em] group-hover:text-redline-red transition-colors duration-300">
+                            Открыть BlueMap
+                        </span>
+                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10 group-hover:bg-redline-red group-hover:rotate-[15deg] transition-all duration-500">
+                            <span class="text-xl">🗺️</span>
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-redline-red/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 </a>
             </div>
         </div>
+
+        <!-- ВОЛНА (z-index: 10 — поверх линий, под текстом) -->
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+             viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" class="fill-gray-50/30 dark:fill-dark-gray/30" />
+                <use xlink:href="#gentle-wave" x="48" y="3" class="fill-gray-50/50 dark:fill-dark-gray/50" />
+                <use xlink:href="#gentle-wave" x="48" y="5" class="fill-gray-50/70 dark:fill-dark-gray/70" />
+                <use xlink:href="#gentle-wave" x="48" y="7" class="fill-gray-50 dark:fill-dark-gray" />
+            </g>
+        </svg>
     </section>
 
-    <!-- Преимущества -->
-    <section id="features" class="py-32 bg-gray-50 dark:bg-dark-gray transition-colors">
+    <!-- АДМИНИСТРАЦИЯ -->
+    <section id="admin" class="py-32 bg-gray-50 dark:bg-dark-gray transition-colors relative z-10">
         <div class="container mx-auto px-6">
-            <div class="text-center mb-20">
-                <h2 class="text-4xl font-black uppercase tracking-tight">Почему мы?</h2>
-                <div class="w-20 h-1.5 bg-redline-red mx-auto mt-4"></div>
+            <div class="text-center mb-20 reveal">
+                <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-4">Администрация Проекта</h2>
+                <div class="w-20 h-1 bg-redline-red mx-auto mb-4"></div>
+                <p class="text-gray-500 uppercase text-xs tracking-[0.4em]">Те, кто создает Redline каждый день</p>
             </div>
-            
-            <div class="grid md:grid-cols-4 gap-6">
-                <!-- Каждой карточке добавлен hover:scale-105 -->
-                <div class="group p-10 bg-white dark:bg-dark-bg rounded-3xl border border-gray-200 dark:border-gray-800 transition-all hover:scale-105 hover:border-redline-red">
-                    <div class="w-14 h-14 bg-redline-red/10 rounded-2xl flex items-center justify-center mb-6 text-redline-red group-hover:bg-redline-red group-hover:text-white transition-colors">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="reveal p-10 bg-white dark:bg-dark-bg rounded-[40px] border border-gray-200 dark:border-white/5 hover:border-redline-red transition-all duration-500 text-center group">
+                    <div class="relative w-32 h-32 mx-auto mb-6">
+                        <img src="https://mc-heads.net/avatar/Alast0r_RL/128" alt="Alast0r_RL" class="w-full h-full rounded-3xl group-hover:scale-110 transition duration-500 shadow-xl relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-redline-red text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase z-20">Руководитель</div>
                     </div>
-                    <h3 class="text-xl font-bold mb-4">БЕЗ ВАЙПОВ</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Мы ценим ваше время. Ваши постройки останутся в истории сервера навсегда.</p>
+                    <h3 class="text-2xl font-black mb-2 uppercase tracking-tight text-redline-red">Alast0r_RL</h3>
+                    <p class="text-gray-500 text-sm mb-8 leading-relaxed italic">Руководитель проекта. Решает все глобальные вопросы сервера.</p>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="copySocial('sr.alast0r')" class="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition-all flex items-center gap-2 text-xs font-bold cursor-pointer uppercase tracking-widest">Discord</button>
+                    </div>
                 </div>
 
-                <div class="group p-10 bg-white dark:bg-dark-bg rounded-3xl border border-gray-200 dark:border-gray-800 transition-all hover:scale-105 hover:border-redline-red">
-                    <div class="w-14 h-14 bg-redline-red/10 rounded-2xl flex items-center justify-center mb-6 text-redline-red group-hover:bg-redline-red group-hover:text-white transition-colors">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <div class="reveal p-10 bg-white dark:bg-dark-bg rounded-[40px] border border-gray-200 dark:border-white/5 hover:border-redline-red transition-all duration-500 text-center group" style="transition-delay: 0.1s;">
+                    <div class="relative w-32 h-32 mx-auto mb-6">
+                        <img src="https://mc-heads.net/avatar/Necr0manthre/128" alt="Necr0manthre" class="w-full h-full rounded-3xl group-hover:scale-110 transition duration-500 shadow-xl relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase z-20">Тех. Админ</div>
                     </div>
-                    <h3 class="text-xl font-bold mb-4">СТАБИЛЬНОСТЬ</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Ryzen 9 и оптимизированное ядро выдают честные 20 TPS при любом онлайне.</p>
+                    <h3 class="text-2xl font-black mb-2 uppercase tracking-tight">Necr0manthre</h3>
+                    <p class="text-gray-500 text-sm mb-8 leading-relaxed font-semibold">Мастер консоли. Следит чтобы сервер работал без лагов и багов.</p>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="copySocial('tm_rix')" class="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition-all flex items-center gap-2 text-xs font-bold cursor-pointer uppercase tracking-widest">Discord</button>
+                    </div>
                 </div>
 
-                <div class="group p-10 bg-white dark:bg-dark-bg rounded-3xl border border-gray-200 dark:border-gray-800 transition-all hover:scale-105 hover:border-redline-red">
-                    <div class="w-14 h-14 bg-redline-red/10 rounded-2xl flex items-center justify-center mb-6 text-redline-red group-hover:bg-redline-red group-hover:text-white transition-colors">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1"></path></svg>
+                <div class="reveal p-10 bg-white dark:bg-dark-bg rounded-[40px] border border-gray-200 dark:border-white/5 hover:border-redline-red transition-all duration-500 text-center group" style="transition-delay: 0.2s;">
+                    <div class="relative w-32 h-32 mx-auto mb-6">
+                        <img src="https://mc-heads.net/avatar/German/128" alt="Герман" class="w-full h-full rounded-3xl group-hover:scale-110 transition duration-500 shadow-xl relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-green-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase z-20">Персонал</div>
                     </div>
-                    <h3 class="text-xl font-bold mb-4">ЭКОНОМИКА</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Живая торговля между игроками, аукционы и уникальная система банков.</p>
-                </div>
-
-                <div class="group p-10 bg-white dark:bg-dark-bg rounded-3xl border border-gray-200 dark:border-gray-800 transition-all hover:scale-105 hover:border-redline-red">
-                    <div class="w-14 h-14 bg-redline-red/10 rounded-2xl flex items-center justify-center mb-6 text-redline-red group-hover:bg-redline-red group-hover:text-white transition-colors">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">КОМЬЮНИТИ</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Средний возраст игроков 18+. Модерация работает 24/7 без выходных.</p>
+                    <h3 class="text-2xl font-black mb-2 uppercase tracking-tight">Герман</h3>
+                    <p class="text-gray-500 text-sm mb-8 leading-relaxed">Он тут просто по блату и ничего не делает.</p>
+                    <div class="flex justify-center gap-4 text-xs font-bold opacity-30 italic">Блат-статус: 100%</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- КАК НАЧАТЬ ИГРАТЬ -->
-    <section id="how-to" class="py-24 bg-white dark:bg-dark-bg transition-colors">
+    <!-- Map Preview -->
+    <section id="map" class="py-32 bg-white dark:bg-dark-bg transition-colors relative z-10">
         <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-center gap-16">
-                <div class="md:w-1/2">
-                    <h2 class="text-4xl font-black mb-6 italic uppercase">Как начать играть?</h2>
-                    <div class="space-y-8">
-                        <div class="flex items-start gap-4">
-                            <span class="bg-redline-red text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0">1</span>
-                            <div>
-                                <h4 class="font-bold text-lg">Запусти Minecraft</h4>
-                                <p class="text-gray-500 text-sm">Используй версию 1.20.1 или выше (рекомендуем Fabric + Iris для графики).</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-4">
-                            <span class="bg-redline-red text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0">2</span>
-                            <div>
-                                <h4 class="font-bold text-lg">Добавь сервер</h4>
-                                <p class="text-gray-500 text-sm">Вставь адрес <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">play.redline.gg</code> в список серверов.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-4">
-                            <span class="bg-redline-red text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0">3</span>
-                            <div>
-                                <h4 class="font-bold text-lg">Врывайся в игру</h4>
-                                <p class="text-gray-500 text-sm">Проходи регистрацию прямо на сервере и начинай выживание!</p>
-                            </div>
-                        </div>
+            <div class="reveal flex flex-col md:flex-row items-center gap-20">
+                <div class="md:w-1/2 relative group cursor-pointer overflow-hidden rounded-[40px] shadow-2xl border border-gray-100 dark:border-white/5">
+                    <img src="https://files.catbox.moe/k2hsm4.jpg" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-110 transition duration-700" alt="Map">
+                    <div class="absolute inset-0 bg-redline-red/20 group-hover:bg-transparent transition"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <a href="http://37.9.13.223:30471/#world:0:0:0:1500:0:0:0:0:perspective" target="_blank" class="bg-white text-black font-black py-4 px-8 rounded-2xl shadow-2xl group-hover:scale-110 transition uppercase cursor-pointer tracking-widest">ОТКРЫТЬ КАРТУ</a>
                     </div>
                 </div>
-                <div class="md:w-1/2 w-full">
-                    <div class="aspect-w-16 rounded-3xl overflow-hidden border-8 border-gray-100 dark:border-gray-800 shadow-2xl">
-                        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Trailer" frameborder="0" allowfullscreen></iframe>
+                <div class="md:w-1/2 text-left">
+                    <h2 class="text-4xl font-black mb-8 uppercase italic tracking-tighter">Живая 3D карта</h2>
+                    <p class="text-xl text-gray-500 mb-6 leading-relaxed">Следи за миром в реальном времени. Найди поселения игроков или разведай новые территории прямо в браузере.</p>
+                    <div class="p-6 bg-gray-50 dark:bg-white/5 rounded-3xl border border-dashed border-gray-300 dark:border-white/10 mb-10">
+                        <p class="text-xs uppercase tracking-widest font-black opacity-40 mb-2">Прямой доступ:</p>
+                        <code class="text-redline-red font-bold break-all tracking-widest">37.9.13.223:30471</code>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Карта -->
-    <section id="map" class="py-24 bg-gray-50 dark:bg-dark-gray transition-colors">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-3xl font-black mb-4">ЖИВАЯ 3D КАРТА</h2>
-            <p class="text-gray-500 mb-12 max-w-xl mx-auto">Следи за миром в реальном времени. Найди свой дом или разведай новые территории прямо в браузере.</p>
-            <div class="h-[500px] w-full bg-gray-200 dark:bg-gray-800 rounded-3xl flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-inner overflow-hidden relative group">
-                <!-- Заглушка для карты -->
-                <div class="absolute inset-0 bg-cover bg-center filter blur-sm opacity-50 transition group-hover:scale-105" style="background-image: url('https://files.catbox.moe/k2hsm4.jpg');"></div>
-                <a href="#" class="relative z-10 bg-redline-red text-white font-bold py-4 px-10 rounded-xl hover:scale-110 transition shadow-xl">ОТКРЫТЬ КАРТУ В НОВОЙ ВКЛАДКЕ</a>
+    <!-- Rules Modal -->
+    <div id="rules-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-black/90 backdrop-blur-md">
+        <div class="bg-white dark:bg-dark-gray w-full max-w-2xl rounded-[40px] p-10 relative max-h-[80vh] overflow-y-auto">
+            <button onclick="toggleModal('rules-modal')" class="absolute top-8 right-8 text-2xl hover:text-redline-red transition cursor-pointer">✕</button>
+            <h2 class="text-3xl font-black mb-8 uppercase italic tracking-tighter text-redline-red">Кодекс Redline</h2>
+            <div class="space-y-6 text-gray-500">
+                <p><strong class="text-redline-red">1. Честность.</strong> Любое ПО, дающее преимущество (читы, x-ray), ведет к бану навсегда.</p>
+                <p><strong class="text-redline-red">2. Созидание.</strong> Гриферство запрещено. Мы уважаем постройки друг друга.</p>
+                <p><strong class="text-redline-red">3. Порядок.</strong> Запрещены лаг-машины и дюпы. Сохраняйте экономику чистой.</p>
+                <p class="pt-6 border-t border-gray-100 dark:border-white/5 italic text-sm text-center">Становясь частью Redline, вы выбираете путь адекватного игрока.</p>
             </div>
+            <button onclick="toggleModal('rules-modal')" class="w-full mt-10 bg-redline-red text-white font-black py-5 rounded-2xl hover:scale-105 transition cursor-pointer uppercase tracking-widest">Я СОГЛАСЕН</button>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
-    <footer class="bg-white dark:bg-dark-bg border-t border-gray-200 dark:border-gray-800 py-16 transition-colors">
-        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-            <div>
-                <span class="text-3xl font-black text-redline-red tracking-tighter">REDLINE</span>
-                <p class="text-gray-400 text-xs mt-2 uppercase tracking-widest">Premium Survival Experience © 2026</p>
-            </div>
-            <div class="flex space-x-8 text-sm font-bold uppercase tracking-widest">
-                <a href="#" class="hover:text-redline-red transition">Правила</a>
-                <a href="#" class="hover:text-redline-red transition">Вики</a>
-                <a href="#" class="hover:text-redline-red transition">Донат</a>
-            </div>
+    <footer class="py-20 bg-gray-50 dark:bg-dark-gray border-t border-gray-100 dark:border-white/5 relative z-10">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <div class="text-4xl font-black text-redline-red mb-10 tracking-tighter uppercase">REDLINE</div>
+            <div class="flex justify-center gap-8 text-xs font-black uppercase tracking-widest mb-6 italic">Discord Сообщество</div>
+            <p class="text-[10px] opacity-30 uppercase tracking-[0.2em]">© 2026 Redline Minecraft. Не является официальным продуктом Mojang.</p>
         </div>
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Анимация линий
-            const lines = document.getElementById('lines-container');
+        document.addEventListener('DOMContentLoaded', () => {
+            const linesContainer = document.getElementById('lines-container');
             setTimeout(() => {
-                lines.classList.remove('initial-state');
-                lines.classList.add('loop-state');
+                if(linesContainer) {
+                    linesContainer.classList.remove('initial-state');
+                    linesContainer.classList.add('loop-state');
+                }
             }, 1500);
 
-            // Тема
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
             const themeBtn = document.getElementById('theme-toggle');
             const darkIcon = document.getElementById('theme-toggle-dark-icon');
             const lightIcon = document.getElementById('theme-toggle-light-icon');
 
+            const updateIcons = () => {
+                if (document.documentElement.classList.contains('dark')) {
+                    darkIcon.classList.add('hidden');
+                    lightIcon.classList.remove('hidden');
+                } else {
+                    darkIcon.classList.remove('hidden');
+                    lightIcon.classList.add('hidden');
+                }
+            };
+
             if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
-                lightIcon.classList.remove('hidden');
             } else {
                 document.documentElement.classList.remove('dark');
-                darkIcon.classList.remove('hidden');
             }
+            updateIcons();
 
             themeBtn.addEventListener('click', () => {
                 document.documentElement.classList.toggle('dark');
-                darkIcon.classList.toggle('hidden');
-                lightIcon.classList.toggle('hidden');
                 localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                updateIcons();
             });
 
-            // Копирование IP
             window.copyIP = function() {
-                const ip = "play.redline.gg";
+                const ip = "37.9.13.223";
                 navigator.clipboard.writeText(ip).then(() => {
                     const el = document.getElementById('ip-text');
-                    const original = el.innerText;
+                    const originalText = el.innerText;
                     el.innerText = "IP СКОПИРОВАН!";
-                    setTimeout(() => el.innerText = original, 2000);
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C4001D', '#ffffff'] });
+                    setTimeout(() => el.innerText = originalText, 2500);
                 });
             }
 
-            // Статус (Fetch API)
-            async function updateStatus() {
-                const count = document.getElementById('online-count');
-                const dot = document.getElementById('status-dot');
-                try {
-                    const res = await fetch('/api/status');
-                    const data = await res.json();
-                    if (data.online) {
-                        count.innerText = data.players;
-                        dot.className = "w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse shadow-[0_0_10px_#22c55e]";
-                    } else {
-                        count.innerText = "OFF";
-                        dot.className = "w-3 h-3 bg-red-500 rounded-full mr-3";
-                    }
-                } catch {
-                    count.innerText = "?";
-                }
+            window.copySocial = function(tag) {
+                navigator.clipboard.writeText(tag).then(() => { alert('Discord тег ' + tag + ' скопирован!'); });
             }
-            updateStatus();
-            setInterval(updateStatus, 15000);
+
+            window.toggleModal = (id) => {
+                const modal = document.getElementById(id);
+                modal.classList.toggle('hidden');
+                modal.classList.toggle('flex');
+                document.body.classList.toggle('overflow-hidden');
+            };
+
+            async function updateStatus() {
+                const countEl = document.getElementById('online-count');
+                const dot = document.getElementById('status-dot');
+                if(!countEl) return;
+                try {
+                    const res = await fetch('https://api.mcstatus.io/v2/status/java/37.9.13.223');
+                    const data = await res.json();
+                    countEl.classList.remove('skeleton', 'text-transparent');
+                    if (data.online) {
+                        countEl.innerText = data.players.online;
+                        dot.className = "w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.6)]";
+                    } else {
+                        countEl.innerText = "OFF";
+                        dot.className = "w-2.5 h-2.5 bg-red-500 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.4)]";
+                    }
+                } catch { countEl.innerText = "?"; }
+            }
+            setTimeout(updateStatus, 1000);
+            setInterval(updateStatus, 30000);
         });
     </script>
 </body>
