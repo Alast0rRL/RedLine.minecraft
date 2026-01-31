@@ -9,6 +9,7 @@
     <meta name="description" content="Redline - классическое выживание без вайпов на мощном железе.">
     <meta property="og:title" content="Redline Minecraft Server">
     <meta property="og:image" content="https://files.catbox.moe/k2hsm4.jpg">
+    <link rel="icon" href="https://mc-heads.net/avatar/Redline/32" type="image/x-icon">
     <meta name="theme-color" content="#C4001D">
 
     <!-- Шрифты -->
@@ -41,310 +42,467 @@
     <style>
         body { font-family: 'Open Sans', sans-serif; overflow-x: hidden; }
         h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; }
+        section { scroll-margin-top: 80px; }
 
-        /* --- КРАСНЫЕ ЛИНИИ (z-index: 1) --- */
-        .animated-lines {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100%;
+        /* --- ИСПРАВЛЕННЫЙ ЭФФЕКТ СВЕЧЕНИЯ --- */
+        #glow-overlay {
+            position: fixed;
+            inset: 0;
             pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
+            z-index: 40;
+            will-change: background;
         }
 
+        /* ТЕМНАЯ ТЕМА: Глубокий мягкий неон */
+        .dark #glow-overlay {
+            background: radial-gradient(
+                600px circle at var(--mouse-x, -100%) var(--mouse-y, -100%), 
+                rgba(196, 0, 29, 0.12) 0%, 
+                rgba(196, 0, 29, 0.04) 30%,
+                transparent 70%
+            );
+        }
+        .dark.is-hovering #glow-overlay {
+            background: radial-gradient(
+                800px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(196, 0, 29, 0.2) 0%, 
+                rgba(196, 0, 29, 0.06) 35%,
+                transparent 80%
+            );
+        }
+
+        /* СВЕТЛАЯ ТЕМА: Чуть поярче, как ты просил */
+        html:not(.dark) #glow-overlay {
+            background: radial-gradient(
+                500px circle at var(--mouse-x, -100%) var(--mouse-y, -100%), 
+                rgba(196, 0, 29, 0.14) 0%,
+                rgba(196, 0, 29, 0.04) 40%,
+                transparent 80%
+            );
+        }
+        html:not(.dark).is-hovering #glow-overlay {
+            background: radial-gradient(
+                600px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(196, 0, 29, 0.22) 0%,
+                rgba(196, 0, 29, 0.06) 45%,
+                transparent 85%
+            );
+        }
+
+        /* --- ФОНОВЫЕ ЭФФЕКТЫ --- */
+        .blob {
+            position: absolute; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(196, 0, 29, 0.08) 0%, transparent 70%);
+            filter: blur(80px); border-radius: 50%; z-index: -1; pointer-events: none;
+            animation: blob-float 25s infinite alternate;
+        }
+        @keyframes blob-float { 0% { transform: translate(-50px, -50px); } 100% { transform: translate(100px, 100px); } }
+
+        .animated-lines {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden;
+        }
         .animated-lines::before, .animated-lines::after {
-            content: '';
-            position: absolute;
-            width: 3px;
-            height: 250%;
+            content: ''; position: absolute; width: 2px; height: 250%;
             background: linear-gradient(transparent, #C4001D, transparent);
-            top: -75%;
-            transform: rotate(45deg);
-            opacity: 0;
-            transition: box-shadow 0.5s ease;
+            top: -75%; transform: rotate(45deg); opacity: 0;
         }
+        .dark .animated-lines::before, .dark .animated-lines::after { box-shadow: 0 0 30px rgba(196, 0, 29, 0.4); }
+        .animated-lines.initial-state::before { animation: enterLeft 1.5s forwards; }
+        .animated-lines.initial-state::after { animation: enterRight 1.5s forwards; }
+        .animated-lines.loop-state::before { opacity: 1; animation: breatheLeft 12s infinite; }
+        .animated-lines.loop-state::after { opacity: 1; animation: breatheRight 12s infinite; }
 
-        .animated-lines::before, .animated-lines::after { box-shadow: 0 0 15px rgba(196, 0, 29, 0.4); }
-        .dark .animated-lines::before, .dark .animated-lines::after { box-shadow: 0 0 20px #C4001D, 0 0 40px rgba(196, 0, 29, 0.8); }
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-        .animated-lines.initial-state::before { animation: enterLeft 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        .animated-lines.initial-state::after { animation: enterRight 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-
-        .animated-lines.loop-state::before { opacity: 1; animation: breatheLeft 12s ease-in-out infinite; }
-        .animated-lines.loop-state::after { opacity: 1; animation: breatheRight 12s ease-in-out infinite; }
-
-        @keyframes enterLeft { 0% { left: -50%; opacity: 0; } 100% { left: 10%; opacity: 1; } }
-        @keyframes enterRight { 0% { left: 150%; opacity: 0; } 100% { left: 90%; opacity: 1; } }
-        @keyframes breatheLeft { 0%, 100% { left: 10%; } 50% { left: 35%; } }
-        @keyframes breatheRight { 0%, 100% { left: 90%; } 50% { left: 65%; } }
-
-        /* --- HERO (ФОН СВЕТЛОЙ ТЕМЫ ЧУТЬ ТЕМНЕЕ) --- */
         .hero-background {
-            background-image: linear-gradient(rgba(230, 230, 230, 0.9), rgba(245, 245, 245, 0.98)), url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-image: linear-gradient(rgba(240, 240, 240, 0.9), rgba(255, 255, 255, 1)), url('https://www.transparenttextures.com/patterns/cubes.png');
             background-attachment: fixed;
         }
         .dark .hero-background {
-            background-image: linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.98)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            background-image: linear-gradient(rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 1)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
         }
 
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        .waves { position: absolute; bottom: 0; width: 100%; height: 80px; z-index: 10; pointer-events: none; }
+        .parallax > use { animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite; }
+        @keyframes move-forever { 0% { transform: translate3d(-90px,0,0); } 100% { transform: translate3d(85px,0,0); } }
 
-        .skeleton {
-            background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-        }
+        #toast.show { opacity: 1; transform: translate(-50%, -20px); }
+
+        @keyframes enterLeft { 0% { left: -50%; opacity: 0; } 100% { left: 10%; opacity: 1; } }
+        @keyframes enterRight { 0% { left: 150%; opacity: 0; } 100% { left: 90%; opacity: 1; } }
+        @keyframes breatheLeft { 0%, 100% { left: 10%; } 50% { left: 25%; } }
+        @keyframes breatheRight { 0%, 100% { left: 90%; } 50% { left: 75%; } }
+
+        .skeleton { background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; }
         @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-        .shimmer-btn { position: relative; overflow: hidden; }
-        .shimmer-btn::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transform: skewX(-20deg); animation: shimmer 4s infinite;
-        }
-        @keyframes shimmer { 0% { left: -100%; } 20% { left: 150%; } 100% { left: 150%; } }
-
-        /* --- АНИМАЦИЯ ВОЛНЫ (z-index: 10) --- */
-        .waves {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 100px;
-            z-index: 10;
-            pointer-events: none;
-        }
-        .parallax > use {
-            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
-        }
-        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
-        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
-        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
-        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
-        
-        @keyframes move-forever {
-            0% { transform: translate3d(-90px,0,0); }
-            100% { transform: translate3d(85px,0,0); }
-        }
-
-        @media (max-width: 768px) { .animated-lines { display: none; } }
     </style>
 </head>
-<body class="bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 transition-colors duration-500">
+<body class="bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 transition-colors duration-500 selection:bg-redline-red selection:text-white">
+
+    <!-- Слой плавного света -->
+    <div id="glow-overlay"></div>
 
     <!-- Навигация -->
-    <nav class="fixed w-full z-[100] bg-white/80 dark:bg-dark-bg/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center relative z-[110]">
-            <a href="#" class="text-2xl font-black text-redline-red tracking-tighter hover:scale-105 transition uppercase relative z-[101]">Redline</a>
+    <nav class="fixed w-full z-[100] bg-white/70 dark:bg-dark-bg/70 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center relative">
+            <a href="#" class="text-2xl font-black text-redline-red tracking-tighter hover:scale-105 transition uppercase">Redline</a>
             
-            <div class="hidden md:flex items-center space-x-10 text-xs font-black uppercase tracking-widest relative z-[101]">
-                <a href="#map" class="hover:text-redline-red transition cursor-pointer">Карта</a>
-                <a href="#admin" class="hover:text-redline-red transition cursor-pointer">Администрация</a>
-                <a href="javascript:void(0)" onclick="toggleModal('rules-modal')" class="hover:text-redline-red transition cursor-pointer">Правила</a>
+            <div class="hidden md:flex items-center space-x-10 text-xs font-black uppercase tracking-widest">
+                <a href="#features" class="hover:text-redline-red transition">Технологии</a>
+                <a href="#map" class="hover:text-redline-red transition">Карта</a>
+                <a href="#gallery" class="hover:text-redline-red transition">Галерея</a>
+                <a href="#faq" class="hover:text-redline-red transition">F.A.Q</a>
                 
                 <button id="theme-toggle" class="p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:rotate-12 transition">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                     <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0z"></path></svg>
                 </button>
             </div>
+
+            <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-gray-100 dark:bg-white/5 text-redline-red">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[150] bg-white dark:bg-dark-bg hidden flex-col items-center justify-center space-y-8 text-2xl font-black uppercase tracking-widest transition-all duration-500">
+        <button onclick="toggleMobileMenu()" class="absolute top-8 right-8 text-redline-red"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        <a href="#features" onclick="toggleMobileMenu()">Технологии</a>
+        <a href="#map" onclick="toggleMobileMenu()">Карта</a>
+        <a href="#gallery" onclick="toggleMobileMenu()">Галерея</a>
+        <a href="#faq" onclick="toggleMobileMenu()">F.A.Q</a>
+    </div>
+
     <!-- Hero Section -->
     <section class="relative h-screen flex items-center justify-center text-center overflow-hidden hero-background">
+        <div class="blob top-20 left-10"></div>
+        <div class="blob bottom-20 right-10"></div>
+        
         <div id="lines-container" class="animated-lines initial-state"></div>
-
-        <div class="relative z-20 px-4 mt-16 pointer-events-auto">
-            <div class="inline-block mb-4 px-4 py-1 border border-redline-red text-redline-red text-[10px] font-black uppercase tracking-[0.3em] rounded-full">
-                Season 1: No Wipe
-            </div>
-            <h1 class="text-5xl md:text-8xl font-black mb-4 tracking-tighter uppercase">Твоя история <br> <span class="text-redline-red">без границ</span></h1>
+        
+        <div class="relative z-20 px-4 mt-16">
+            <div class="reveal inline-block mb-4 px-4 py-1 border border-redline-red text-redline-red text-[10px] font-black uppercase tracking-[0.3em] rounded-full">Season 1: No Wipe</div>
+            <h1 class="reveal text-5xl md:text-8xl font-black mb-4 tracking-tighter uppercase">Твоя история <br> <span class="text-redline-red">без границ</span></h1>
             
-            <div class="flex items-center justify-center gap-3 mb-12">
+            <div class="reveal flex items-center justify-center gap-3 mb-12">
                 <div id="status-dot" class="w-2.5 h-2.5 bg-gray-500 rounded-full"></div>
-                <div id="online-wrapper" class="font-mono text-sm tracking-widest uppercase">
-                    <span id="online-count" class="skeleton px-6 py-1 rounded-md text-transparent">-</span> 
-                    <span class="opacity-50">/ 500 Online</span>
-                </div>
+                <div class="font-mono text-sm tracking-widest uppercase"><span id="online-count" class="px-6 py-1 rounded-md text-transparent skeleton">-</span> <span class="opacity-50">/ 500 Online</span></div>
             </div>
 
-            <div class="flex flex-col md:flex-row items-center justify-center gap-6 relative z-50 pointer-events-auto">
-                <!-- Нажатие открывает модальное окно -->
-                <button onclick="toggleModal('rules-modal')" 
-                        class="shimmer-btn group relative flex items-center justify-center w-full md:w-80 h-24 bg-redline-red text-white rounded-3xl shadow-[0_20px_50px_rgba(196,0,29,0.3)] hover:shadow-[0_25px_60px_rgba(196,0,29,0.5)] transition-all duration-500 hover:-translate-y-2 active:scale-95 cursor-pointer z-50">
-                    <div class="flex items-center gap-4">
-                        <span id="ip-text" class="text-lg font-black uppercase tracking-[0.2em]">Копировать IP</span>
-                        <svg class="w-6 h-6 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    </div>
+            <div class="reveal flex flex-col md:flex-row items-center justify-center gap-6 relative z-50">
+                <button onclick="toggleModal('rules-modal')" class="group relative flex items-center justify-center w-full md:w-80 h-24 bg-redline-red text-white rounded-3xl shadow-[0_20px_50px_rgba(196,0,29,0.3)] transition-all duration-500 hover:-translate-y-2 active:scale-95 overflow-hidden">
+                    <span class="text-lg font-black uppercase tracking-[0.2em]">Играть сейчас</span>
                 </button>
-                
-                <a href="http://37.9.13.223:30471/#world:0:0:0:1500:0:0:0:0:perspective" target="_blank" 
-                   class="group relative flex items-center justify-center w-full md:w-80 h-24 bg-white/5 dark:bg-white/5 backdrop-blur-md border border-gray-300 dark:border-white/10 rounded-3xl hover:border-redline-red/50 hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 active:scale-95 cursor-pointer z-50 overflow-hidden">
-                    <div class="flex items-center gap-4">
-                        <span class="text-lg font-black uppercase tracking-[0.2em] group-hover:text-redline-red transition-colors duration-300">
-                            Открыть BlueMap
-                        </span>
-                        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-white/10 group-hover:bg-redline-red group-hover:rotate-[15deg] transition-all duration-500">
-                            <span class="text-xl">🗺️</span>
-                        </div>
-                    </div>
+                <a href="https://discord.gg/F9JJpa5VsE" target="_blank" class="group relative flex items-center justify-center w-full md:w-80 h-24 bg-[#5865F2] text-white rounded-3xl hover:-translate-y-2 transition-all duration-500 shadow-xl overflow-hidden">
+                    <span class="text-lg font-black uppercase tracking-[0.2em]">Наш Discord</span>
                 </a>
             </div>
         </div>
 
-        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
             <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs>
             <g class="parallax">
-                <use xlink:href="#gentle-wave" x="48" y="0" class="fill-gray-50/30 dark:fill-dark-gray/30" />
-                <use xlink:href="#gentle-wave" x="48" y="3" class="fill-gray-50/50 dark:fill-dark-gray/50" />
-                <use xlink:href="#gentle-wave" x="48" y="5" class="fill-gray-50/70 dark:fill-dark-gray/70" />
-                <use xlink:href="#gentle-wave" x="48" y="7" class="fill-gray-50 dark:fill-dark-gray" />
+                <use xlink:href="#gentle-wave" x="48" y="0" class="fill-gray-50/30 dark:fill-dark-gray/30" /><use xlink:href="#gentle-wave" x="48" y="3" class="fill-gray-50/50 dark:fill-dark-gray/50" /><use xlink:href="#gentle-wave" x="48" y="5" class="fill-gray-50/70 dark:fill-dark-gray/70" /><use xlink:href="#gentle-wave" x="48" y="7" class="fill-gray-50 dark:fill-dark-gray" />
             </g>
         </svg>
     </section>
 
-    <!-- КАРТА (ВЫШЕ) -->
-    <section id="map" class="py-32 bg-white dark:bg-dark-bg transition-colors relative z-10">
+    <!-- ТЕХНОЛОГИИ -->
+    <section id="features" class="py-32 bg-white dark:bg-dark-bg relative z-10 text-center">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-16 reveal">Технологии Redline</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="reveal p-10 rounded-[40px] bg-gray-50 dark:bg-white/[0.03] backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-redline-red/50 transition-all duration-500 text-left">
+                    <div class="text-4xl mb-6">🛡️</div>
+                    <h3 class="text-xl font-black mb-4 uppercase text-redline-red">Защита вещей</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Инвентарь не исчезает по таймеру и не горит в лаве. Игра без лишнего стресса.</p>
+                </div>
+                <div class="reveal p-10 rounded-[40px] bg-gray-50 dark:bg-white/[0.03] backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-redline-red/50 transition-all duration-500 text-left">
+                    <div class="text-4xl mb-6">💎</div>
+                    <h3 class="text-xl font-black mb-4 uppercase text-redline-red">Отсутствие вайпов</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Мир существует вечно. Твои постройки станут частью истории сервера.</p>
+                </div>
+                <div class="reveal p-10 rounded-[40px] bg-gray-50 dark:bg-white/[0.03] backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-redline-red/50 transition-all duration-500 text-left">
+                    <div class="text-4xl mb-6">🎙️</div>
+                    <h3 class="text-xl font-black mb-4 uppercase text-redline-red">Голосовой чат</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Живое общение с игроками прямо в Minecraft. Слышь направление голоса.</p>
+                </div>
+                <div class="reveal p-10 rounded-[40px] bg-gray-50 dark:bg-white/[0.03] backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-redline-red/50 transition-all duration-500 text-left">
+                    <div class="text-4xl mb-6">🗺️</div>
+                    <h3 class="text-xl font-black mb-4 uppercase text-redline-red">Живая 3D карта</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Следи за миром в реальном времени. Найди поселения игроков прямо в браузере.</p>
+                </div>
+                <div class="reveal p-10 rounded-[40px] bg-gray-50 dark:bg-white/[0.03] backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-redline-red/50 transition-all duration-500 text-left">
+                    <div class="text-4xl mb-6">⚔️</div>
+                    <h3 class="text-xl font-black mb-4 uppercase text-redline-red">Головы игроков</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Уникальные трофеи после каждой PvP победы. Собери свою коллекцию.</p>
+                </div>
+                <div class="reveal p-10 rounded-[40px] bg-gray-50 dark:bg-white/[0.03] backdrop-blur-md border border-gray-100 dark:border-white/5 hover:border-redline-red/50 transition-all duration-500 text-left">
+                    <div class="text-4xl mb-6">⏳</div>
+                    <h3 class="text-xl font-black mb-4 uppercase text-redline-red">Безопасность баз</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Забудь о гриферстве. Мы откатим любые разрушения в один клик.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- КАРТА ДЕТАЛЬНО -->
+    <section id="map" class="py-32 bg-gray-50 dark:bg-dark-gray relative z-10">
         <div class="container mx-auto px-6">
             <div class="reveal flex flex-col md:flex-row items-center gap-20">
-                <div class="md:w-1/2 relative group cursor-pointer overflow-hidden rounded-[40px] shadow-2xl border border-gray-100 dark:border-white/5">
-                    <img src="/static/map.jpg" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-110 transition duration-700" alt="Map">
-                    <div class="absolute inset-0 bg-redline-red/20 group-hover:bg-transparent transition"></div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <a href="http://37.9.13.223:30471/#world:0:0:0:1500:0:0:0:0:perspective" target="_blank" class="bg-white text-black font-black py-4 px-8 rounded-2xl shadow-2xl group-hover:scale-110 transition uppercase cursor-pointer tracking-widest">ОТКРЫТЬ КАРТУ</a>
+                <div class="md:w-1/2 relative group overflow-hidden rounded-[40px] shadow-2xl">
+                    <img src="https://files.catbox.moe/k2hsm4.jpg" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-105 transition duration-700">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500 bg-black/40">
+                        <a href="http://37.9.13.223:30471/" target="_blank" class="bg-redline-red text-white font-black py-5 px-10 rounded-2xl shadow-2xl uppercase tracking-widest">Открыть BlueMap</a>
                     </div>
                 </div>
-                <div class="md:w-1/2 text-left">
+                <div class="md:w-1/2">
                     <h2 class="text-4xl font-black mb-8 uppercase italic tracking-tighter">Живая 3D карта</h2>
-                    <p class="text-xl text-gray-500 mb-6 leading-relaxed">Следи за миром в реальном времени. Найди поселения игроков или разведай новые территории прямо в браузере.</p>
-                    <div class="p-6 bg-gray-50 dark:bg-white/5 rounded-3xl border border-dashed border-gray-300 dark:border-white/10 mb-10">
-                        <p class="text-xs uppercase tracking-widest font-black opacity-40 mb-2">Прямой доступ:</p>
-                        <code class="text-redline-red font-bold break-all tracking-widest">37.9.13.223:30471</code>
-                    </div>
+                    <p class="text-xl text-gray-500 mb-6 leading-relaxed">Следи за миром в реальном времени. Найди поселения игроков прямо в браузере.</p>
+                    <code class="text-redline-red font-bold text-lg p-4 bg-white dark:bg-white/5 rounded-2xl border border-dashed border-redline-red/30 block w-fit">37.9.13.223:30471</code>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- АДМИНИСТРАЦИЯ (НИЖЕ) -->
-    <section id="admin" class="py-32 bg-gray-50 dark:bg-dark-gray transition-colors relative z-10">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-20 reveal">
-                <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-4">Администрация Проекта</h2>
-                <div class="w-20 h-1 bg-redline-red mx-auto mb-4"></div>
-                <p class="text-gray-500 uppercase text-xs tracking-[0.4em]">Те, кто создает Redline каждый день</p>
+    <!-- ГАЛЕРЕЯ -->
+    <section id="gallery" class="py-32 bg-white dark:bg-dark-bg relative z-10">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-16 reveal">Мир в объективе</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <img src="https://files.catbox.moe/k2hsm4.jpg" onclick="openLightbox(this.src)" class="reveal aspect-video rounded-3xl object-cover hover:scale-105 transition-all duration-500 shadow-lg cursor-pointer">
+                <img src="https://files.catbox.moe/k2hsm4.jpg" onclick="openLightbox(this.src)" class="reveal aspect-video rounded-3xl object-cover hover:scale-105 transition-all duration-500 shadow-lg cursor-pointer">
+                <img src="https://files.catbox.moe/k2hsm4.jpg" onclick="openLightbox(this.src)" class="reveal aspect-video rounded-3xl object-cover hover:scale-105 transition-all duration-500 shadow-lg cursor-pointer">
+                <img src="https://files.catbox.moe/k2hsm4.jpg" onclick="openLightbox(this.src)" class="reveal aspect-video rounded-3xl object-cover hover:scale-105 transition-all duration-500 shadow-lg cursor-pointer">
             </div>
+        </div>
+    </section>
 
+    <!-- FAQ -->
+    <section id="faq" class="py-32 bg-gray-50 dark:bg-dark-gray relative z-10">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <h2 class="text-4xl font-black uppercase italic tracking-tighter text-center mb-16 reveal">Частые Вопросы</h2>
+            <div class="space-y-4">
+                <details class="reveal bg-white dark:bg-dark-bg p-8 rounded-[30px] border border-gray-100 dark:border-white/5 shadow-sm group">
+                    <summary class="flex justify-between items-center font-black uppercase tracking-tight list-none cursor-pointer">Версия сервера?<svg class="w-6 h-6 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></summary>
+                    <p class="mt-6 text-gray-500 italic">Актуальная Java Edition (1.20.1+). Вход с любых клиентов.</p>
+                </details>
+                <details class="reveal bg-white dark:bg-dark-bg p-8 rounded-[30px] border border-gray-100 dark:border-white/5 shadow-sm group">
+                    <summary class="flex justify-between items-center font-black uppercase tracking-tight list-none cursor-pointer">Нужна ли лицензия?<svg class="w-6 h-6 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></summary>
+                    <p class="mt-6 text-gray-500 italic">Нет, сервер доступен как для лицензии, так и для пиратских клиентов.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- КОМАНДА -->
+    <section id="admin" class="py-32 bg-white dark:bg-dark-bg relative z-10">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-20 reveal">Команда Проекта</h2>
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="reveal p-10 bg-white dark:bg-dark-bg rounded-[40px] border border-gray-200 dark:border-white/5 hover:border-redline-red transition-all duration-500 text-center group">
+                <!-- Alastor -->
+                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
                     <div class="relative w-32 h-32 mx-auto mb-6">
-                        <img src="https://mc-heads.net/avatar/Alast0r_RL/128" alt="Alast0r_RL" class="w-full h-full rounded-3xl group-hover:scale-110 transition duration-500 shadow-xl relative z-10">
-                        <div class="absolute -bottom-2 -right-2 bg-redline-red text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase z-20">Руководитель</div>
+                        <img src="https://mc-heads.net/avatar/Alast0r_RL/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-redline-red text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Руководитель</div>
                     </div>
-                    <h3 class="text-2xl font-black mb-2 uppercase tracking-tight text-redline-red">Alast0r_RL</h3>
-                    <p class="text-gray-500 text-sm mb-8 leading-relaxed italic">Руководитель проекта. Решает все глобальные вопросы сервера.</p>
-                    <button onclick="copySocial('sr.alast0r')" class="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition-all flex items-center justify-center gap-2 text-xs font-bold w-full uppercase tracking-widest">Discord</button>
+                    <h3 class="text-2xl font-black text-redline-red uppercase mb-2">Alast0r_RL</h3>
+                    <p class="text-gray-500 text-sm mb-8 italic">Создатель проекта. Решает все глобальные вопросы сервера.</p>
+                    <button onclick="copySocial('sr.alast0r')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
                 </div>
-
-                <div class="reveal p-10 bg-white dark:bg-dark-bg rounded-[40px] border border-gray-200 dark:border-white/5 hover:border-redline-red transition-all duration-500 text-center group" style="transition-delay: 0.1s;">
+                <!-- Necroman -->
+                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
                     <div class="relative w-32 h-32 mx-auto mb-6">
-                        <img src="https://mc-heads.net/avatar/Necr0manthre/128" alt="Necr0manthre" class="w-full h-full rounded-3xl group-hover:scale-110 transition duration-500 shadow-xl relative z-10">
-                        <div class="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase z-20">Тех. Админ</div>
+                        <img src="https://mc-heads.net/avatar/Necr0manthre/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Тех. Админ</div>
                     </div>
-                    <h3 class="text-2xl font-black mb-2 uppercase tracking-tight">Necr0manthre</h3>
-                    <p class="text-gray-500 text-sm mb-8 leading-relaxed font-semibold">Мастер консоли. Следит чтобы сервер работал без лагов и багов.</p>
-                    <button onclick="copySocial('tm_rix')" class="p-4 bg-gray-100 dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition-all flex items-center justify-center gap-2 text-xs font-bold w-full uppercase tracking-widest">Discord</button>
+                    <h3 class="text-2xl font-black uppercase mb-2">Necr0manthre</h3>
+                    <p class="text-gray-500 text-sm mb-8 font-semibold">Мастер конфигов. Следит чтобы сервер работал без лагов.</p>
+                    <button onclick="copySocial('tm_rix')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
                 </div>
-
-                <div class="reveal p-10 bg-white dark:bg-dark-bg rounded-[40px] border border-gray-200 dark:border-white/5 hover:border-redline-red transition-all duration-500 text-center group" style="transition-delay: 0.2s;">
+                <!-- German -->
+                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
                     <div class="relative w-32 h-32 mx-auto mb-6">
-                        <img src="https://mc-heads.net/avatar/German/128" alt="Герман" class="w-full h-full rounded-3xl group-hover:scale-110 transition duration-500 shadow-xl relative z-10">
-                        <div class="absolute -bottom-2 -right-2 bg-green-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase z-20">Персонал</div>
+                        <img src="https://mc-heads.net/avatar/German/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-green-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Персонал</div>
                     </div>
-                    <h3 class="text-2xl font-black mb-2 uppercase tracking-tight">Герман</h3>
-                    <p class="text-gray-500 text-sm mb-8 leading-relaxed">Он тут просто по блату и ничего не делает.</p>
-                    <div class="flex justify-center gap-4 text-xs font-bold opacity-30 italic">Блат-статус: 100%</div>
+                    <h3 class="text-2xl font-black uppercase mb-2">German</h3>
+                    <p class="text-gray-500 text-sm mb-8 italic">Душа компании. Отвечает за атмосферу и общение.</p>
+                    <button onclick="copySocial('german_top')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Правила + Копирование IP -->
-    <div id="rules-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-black/90 backdrop-blur-md">
-        <div class="bg-white dark:bg-dark-gray w-full max-w-2xl rounded-[40px] p-10 relative max-h-[80vh] overflow-y-auto">
-            <button onclick="toggleModal('rules-modal')" class="absolute top-8 right-8 text-2xl hover:text-redline-red transition cursor-pointer">✕</button>
-            <h2 class="text-3xl font-black mb-8 uppercase italic tracking-tighter text-redline-red">Кодекс Redline</h2>
-            <div class="space-y-6 text-gray-500">
-                <p><strong class="text-redline-red">1. Честность.</strong> Любое ПО, дающее преимущество (читы, x-ray), ведет к бану навсегда.</p>
-                <p><strong class="text-redline-red">2. Созидание.</strong> Гриферство запрещено. Мы уважаем постройки друг друга.</p>
-                <p><strong class="text-redline-red">3. Порядок.</strong> Запрещены лаг-машины и дюпы. Сохраняйте экономику чистой.</p>
-                <p class="pt-6 border-t border-gray-100 dark:border-white/5 italic text-sm text-center">Чтобы зайти на сервер, подтвердите свое согласие с правилами.</p>
-            </div>
-            <!-- КНОПКА КОПИРОВАНИЯ -->
-            <button onclick="confirmAndCopyIP()" class="w-full mt-10 bg-redline-red text-white font-black py-5 rounded-2xl hover:scale-105 transition cursor-pointer uppercase tracking-widest">Согласиться с правилами и скопировать IP</button>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="py-20 bg-gray-50 dark:bg-dark-gray border-t border-gray-100 dark:border-white/5 relative z-10">
-        <div class="container mx-auto px-6 text-center text-gray-400">
-            <div class="text-4xl font-black text-redline-red mb-10 tracking-tighter uppercase">REDLINE</div>
-            <p class="text-[10px] opacity-30 uppercase tracking-[0.2em]">© 2026 Redline Minecraft. Не является официальным продуктом Mojang.</p>
+    <!-- ПОДВАЛ -->
+    <footer class="py-12 bg-white dark:bg-dark-bg text-center border-t border-gray-100 dark:border-white/5 relative z-10">
+        <div class="container mx-auto px-6">
+            <div class="text-3xl font-black text-redline-red uppercase tracking-tighter mb-4">Redline</div>
+            <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                © 2026 Redline Minecraft. Не является официальным продуктом Mojang.
+            </p>
         </div>
     </footer>
 
+    <!-- Modal Rules -->
+    <div id="rules-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-black/90 backdrop-blur-md">
+        <div class="bg-white dark:bg-dark-gray w-full max-w-2xl rounded-[40px] p-10 relative">
+            <button onclick="toggleModal('rules-modal')" class="absolute top-8 right-8 text-2xl hover:text-redline-red transition">✕</button>
+            <h2 class="text-3xl font-black mb-8 uppercase text-redline-red italic">Кодекс Redline</h2>
+            <div class="space-y-6 text-gray-500 text-left text-sm">
+                <p><strong>1. Честность.</strong> Любые читы — бан навсегда без права амнистии.</p>
+                <p><strong>2. Созидание.</strong> Гриферство запрещено в любом виде. Мы за творчество.</p>
+                <p><strong>3. Порядок.</strong> Запрещено создание лаг-машин и намеренная нагрузка сервера.</p>
+            </div>
+            <button onclick="confirmAndCopyIP()" class="w-full mt-10 bg-redline-red text-white font-black py-5 rounded-2xl hover:scale-105 transition uppercase tracking-widest">Принять и скопировать IP</button>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" onclick="closeLightbox()" class="fixed inset-0 z-[300] bg-black/95 hidden items-center justify-center p-4">
+        <img id="lightbox-img" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl">
+    </div>
+
+    <!-- UI Elements -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 z-[60] bg-redline-red text-white p-4 rounded-2xl shadow-2xl transition-all duration-500 opacity-0 translate-y-10 pointer-events-none hover:-translate-y-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg></button>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[250] bg-dark-bg dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] opacity-0 transition-all duration-500 pointer-events-none border border-redline-red/50 shadow-2xl">Скопировано!</div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const linesContainer = document.getElementById('lines-container');
-            setTimeout(() => { if(linesContainer) { linesContainer.classList.remove('initial-state'); linesContainer.classList.add('loop-state'); } }, 1500);
+            // Элемент подсветки
+            const glowOverlay = document.getElementById('glow-overlay');
+            let mouseX = -1000;
+            let mouseY = -1000;
+            let currentX = -1000;
+            let currentY = -1000;
 
-            const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); }); }, { threshold: 0.1 });
+            // Отслеживание мыши
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            // Плавный цикл анимации для свечения (Lerp)
+            function animateGlow() {
+                // Коэффициент 0.1 дает эффект плавного "догоняния" курсора
+                currentX += (mouseX - currentX) * 0.1;
+                currentY += (mouseY - currentY) * 0.1;
+
+                glowOverlay.style.setProperty('--mouse-x', `${currentX}px`);
+                glowOverlay.style.setProperty('--mouse-y', `${currentY}px`);
+
+                requestAnimationFrame(animateGlow);
+            }
+            animateGlow();
+
+            // Эффект увеличения свечения при наведении
+            document.addEventListener('mouseover', (e) => {
+                if (e.target.closest('button, a, summary, .cursor-pointer')) {
+                    document.body.classList.add('is-hovering');
+                }
+            });
+            document.addEventListener('mouseout', (e) => {
+                if (e.target.closest('button, a, summary, .cursor-pointer')) {
+                    document.body.classList.remove('is-hovering');
+                }
+            });
+
+            // Анимация линий фона
+            const linesContainer = document.getElementById('lines-container');
+            setTimeout(() => { 
+                if(linesContainer) { 
+                    linesContainer.classList.remove('initial-state'); 
+                    linesContainer.classList.add('loop-state'); 
+                } 
+            }, 1500);
+
+            // Появление элементов при скролле
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { 
+                    if (entry.isIntersecting) entry.target.classList.add('active'); 
+                });
+            }, { threshold: 0.15 });
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+            // Переключение темы
             const themeBtn = document.getElementById('theme-toggle');
-            const darkIcon = document.getElementById('theme-toggle-dark-icon');
-            const lightIcon = document.getElementById('theme-toggle-light-icon');
-
             const updateIcons = () => {
-                if (document.documentElement.classList.contains('dark')) { darkIcon.classList.add('hidden'); lightIcon.classList.remove('hidden'); }
-                else { darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); }
+                const darkIcon = document.getElementById('theme-toggle-dark-icon');
+                const lightIcon = document.getElementById('theme-toggle-light-icon');
+                if (document.documentElement.classList.contains('dark')) { 
+                    darkIcon.classList.add('hidden'); lightIcon.classList.remove('hidden'); 
+                } else { 
+                    darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); 
+                }
             };
 
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
-            else { document.documentElement.classList.remove('dark'); }
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
             updateIcons();
 
-            themeBtn.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'; updateIcons(); });
+            themeBtn.addEventListener('click', () => { 
+                document.documentElement.classList.toggle('dark'); 
+                localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'; 
+                updateIcons(); 
+            });
 
-            // Функция копирования при нажатии в модальном окне
-            window.confirmAndCopyIP = function() {
-                const ip = "37.9.13.223";
-                navigator.clipboard.writeText(ip).then(() => {
-                    toggleModal('rules-modal'); // Закрываем окно
-                    
-                    const el = document.getElementById('ip-text');
-                    const originalText = el.innerText;
-                    el.innerText = "IP СКОПИРОВАН!";
-                    
-                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C4001D', '#ffffff'] });
-                    
-                    setTimeout(() => el.innerText = originalText, 2500);
-                });
-            }
+            // Кнопка наверх
+            const backToTop = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 500) backToTop.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+                else backToTop.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+            }, { passive: true });
+            backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-            window.copySocial = function(tag) { navigator.clipboard.writeText(tag).then(() => { alert('Discord тег ' + tag + ' скопирован!'); }); }
+            // Глобальные функции
+            window.openLightbox = (src) => {
+                document.getElementById('lightbox-img').src = src;
+                document.getElementById('lightbox').classList.remove('hidden');
+                document.getElementById('lightbox').classList.add('flex');
+            };
+            window.closeLightbox = () => document.getElementById('lightbox').classList.add('hidden');
 
-            window.toggleModal = (id) => {
-                const modal = document.getElementById(id);
-                modal.classList.toggle('hidden');
-                modal.classList.toggle('flex');
-                document.body.classList.toggle('overflow-hidden');
+            window.showToast = (msg) => {
+                const toast = document.getElementById('toast'); 
+                toast.innerText = msg;
+                toast.classList.add('show'); 
+                setTimeout(() => toast.classList.remove('show'), 3000);
             };
 
+            window.toggleModal = (id) => {
+                const el = document.getElementById(id);
+                el.classList.toggle('hidden'); 
+                el.classList.toggle('flex');
+            };
+
+            window.toggleMobileMenu = () => {
+                const el = document.getElementById('mobile-menu');
+                el.classList.toggle('hidden'); 
+                el.classList.toggle('flex');
+            };
+
+            window.confirmAndCopyIP = () => {
+                navigator.clipboard.writeText("37.9.13.223").then(() => {
+                    toggleModal('rules-modal');
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C4001D', '#ffffff'] });
+                    showToast("IP СКОПИРОВАН!");
+                });
+            };
+
+            window.copySocial = (tag) => {
+                navigator.clipboard.writeText(tag).then(() => showToast("DISCORD ТЕГ СКОПИРОВАН!"));
+            };
+
+            // Статус сервера
             async function updateStatus() {
                 const countEl = document.getElementById('online-count');
                 const dot = document.getElementById('status-dot');
-                if(!countEl) return;
                 try {
                     const res = await fetch('https://api.mcstatus.io/v2/status/java/37.9.13.223');
                     const data = await res.json();
@@ -352,13 +510,15 @@
                     if (data.online) {
                         countEl.innerText = data.players.online;
                         dot.className = "w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.6)]";
-                    } else {
-                        countEl.innerText = "OFF";
-                        dot.className = "w-2.5 h-2.5 bg-red-500 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.4)]";
+                    } else { 
+                        countEl.innerText = "OFF"; 
+                        dot.className = "w-2.5 h-2.5 bg-red-500 rounded-full"; 
                     }
-                } catch { countEl.innerText = "?"; }
+                } catch { 
+                    countEl.innerText = "?"; 
+                }
             }
-            setTimeout(updateStatus, 1000);
+            updateStatus(); 
             setInterval(updateStatus, 30000);
         });
     </script>
