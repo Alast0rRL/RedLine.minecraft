@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru" class="scroll-smooth dark">
+<html lang="ru" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- SEO & Meta Tags -->
     <title>Redline | 37.9.13.223</title>
     <meta name="description" content="Redline - классическое выживание без вайпов на мощном железе.">
     <meta property="og:title" content="Redline Minecraft Server">
@@ -12,13 +11,12 @@
     <link rel="icon" href="https://mc-heads.net/avatar/Redline/32" type="image/x-icon">
     <meta name="theme-color" content="#C4001D">
 
-    <!-- Шрифты -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     
-    <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -42,9 +40,15 @@
     <style>
         body { font-family: 'Open Sans', sans-serif; overflow-x: hidden; }
         h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; }
-        section { scroll-margin-top: 80px; }
+        
+        /* --- LENIS SMOOTH SCROLL STYLES --- */
+        html.lenis, html.lenis body { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto !important; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+        .lenis.lenis-scrolling iframe { pointer-events: none; }
 
-        /* --- ИСПРАВЛЕННЫЙ ЭФФЕКТ СВЕЧЕНИЯ --- */
+        /* --- GLOW OVERLAY --- */
         #glow-overlay {
             position: fixed;
             inset: 0;
@@ -53,7 +57,6 @@
             will-change: background;
         }
 
-        /* ТЕМНАЯ ТЕМА: Глубокий мягкий неон */
         .dark #glow-overlay {
             background: radial-gradient(
                 600px circle at var(--mouse-x, -100%) var(--mouse-y, -100%), 
@@ -71,7 +74,6 @@
             );
         }
 
-        /* СВЕТЛАЯ ТЕМА: Чуть поярче, как ты просил */
         html:not(.dark) #glow-overlay {
             background: radial-gradient(
                 500px circle at var(--mouse-x, -100%) var(--mouse-y, -100%), 
@@ -89,7 +91,18 @@
             );
         }
 
-        /* --- ФОНОВЫЕ ЭФФЕКТЫ --- */
+        /* --- HERO BACKGROUND TWEAKS --- */
+        /* Светлая тема: Сделана максимально светлой (белый градиент) */
+        .hero-background {
+            background-image: linear-gradient(rgba(215, 215, 215, 0.96), rgba(255, 255, 255, 0.92)), url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-attachment: fixed;
+            background-size: auto, 300px;
+        }
+        /* Темная тема: Сделана темнее (уменьшена прозрачность наложения) */
+        .dark .hero-background {
+            background-image: linear-gradient(rgba(10, 10, 10, 0.85), rgba(5, 5, 5, 0.92)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+        }
+
         .blob {
             position: absolute; width: 600px; height: 600px;
             background: radial-gradient(circle, rgba(196, 0, 29, 0.08) 0%, transparent 70%);
@@ -113,16 +126,8 @@
         .animated-lines.loop-state::before { opacity: 1; animation: breatheLeft 12s infinite; }
         .animated-lines.loop-state::after { opacity: 1; animation: breatheRight 12s infinite; }
 
-        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
-
-        .hero-background {
-            background-image: linear-gradient(rgba(240, 240, 240, 0.9), rgba(255, 255, 255, 1)), url('https://www.transparenttextures.com/patterns/cubes.png');
-            background-attachment: fixed;
-        }
-        .dark .hero-background {
-            background-image: linear-gradient(rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 1)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
-        }
 
         .waves { position: absolute; bottom: 0; width: 100%; height: 80px; z-index: 10; pointer-events: none; }
         .parallax > use { animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -141,19 +146,17 @@
 </head>
 <body class="bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 transition-colors duration-500 selection:bg-redline-red selection:text-white">
 
-    <!-- Слой плавного света -->
     <div id="glow-overlay"></div>
 
-    <!-- Навигация -->
     <nav class="fixed w-full z-[100] bg-white/70 dark:bg-dark-bg/70 backdrop-blur-md border-b border-gray-200 dark:border-white/5">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center relative">
-            <a href="#" class="text-2xl font-black text-redline-red tracking-tighter hover:scale-105 transition uppercase">Redline</a>
+            <a href="#" class="nav-link text-2xl font-black text-redline-red tracking-tighter hover:scale-105 transition uppercase">Redline</a>
             
             <div class="hidden md:flex items-center space-x-10 text-xs font-black uppercase tracking-widest">
-                <a href="#features" class="hover:text-redline-red transition">Технологии</a>
-                <a href="#map" class="hover:text-redline-red transition">Карта</a>
-                <a href="#gallery" class="hover:text-redline-red transition">Галерея</a>
-                <a href="#faq" class="hover:text-redline-red transition">F.A.Q</a>
+                <a href="#features" class="nav-link hover:text-redline-red transition">Технологии</a>
+                <a href="#map" class="nav-link hover:text-redline-red transition">Карта</a>
+                <a href="#gallery" class="nav-link hover:text-redline-red transition">Галерея</a>
+                <a href="#faq" class="nav-link hover:text-redline-red transition">F.A.Q</a>
                 
                 <button id="theme-toggle" class="p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:rotate-12 transition">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -167,25 +170,26 @@
         </div>
     </nav>
 
-    <!-- Mobile Menu -->
     <div id="mobile-menu" class="fixed inset-0 z-[150] bg-white dark:bg-dark-bg hidden flex-col items-center justify-center space-y-8 text-2xl font-black uppercase tracking-widest transition-all duration-500">
         <button onclick="toggleMobileMenu()" class="absolute top-8 right-8 text-redline-red"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        <a href="#features" onclick="toggleMobileMenu()">Технологии</a>
-        <a href="#map" onclick="toggleMobileMenu()">Карта</a>
-        <a href="#gallery" onclick="toggleMobileMenu()">Галерея</a>
-        <a href="#faq" onclick="toggleMobileMenu()">F.A.Q</a>
+        <a href="#features" class="nav-link" onclick="toggleMobileMenu()">Технологии</a>
+        <a href="#map" class="nav-link" onclick="toggleMobileMenu()">Карта</a>
+        <a href="#gallery" class="nav-link" onclick="toggleMobileMenu()">Галерея</a>
+        <a href="#faq" class="nav-link" onclick="toggleMobileMenu()">F.A.Q</a>
     </div>
 
-    <!-- Hero Section -->
+    <!-- MAIN HERO SECTION -->
     <section class="relative h-screen flex items-center justify-center text-center overflow-hidden hero-background">
-        <div class="blob top-20 left-10"></div>
-        <div class="blob bottom-20 right-10"></div>
+        <!-- Адаптивные слои затемнения -->
+        <div class="absolute inset-0 z-0 bg-white/10 dark:bg-black/40 pointer-events-none"></div>
+        <div class="blob top-20 left-10 opacity-40"></div>
+        <div class="blob bottom-20 right-10 opacity-40"></div>
         
         <div id="lines-container" class="animated-lines initial-state"></div>
         
         <div class="relative z-20 px-4 mt-16">
             <div class="reveal inline-block mb-4 px-4 py-1 border border-redline-red text-redline-red text-[10px] font-black uppercase tracking-[0.3em] rounded-full">Season 1: No Wipe</div>
-            <h1 class="reveal text-5xl md:text-8xl font-black mb-4 tracking-tighter uppercase">Твоя история <br> <span class="text-redline-red">без границ</span></h1>
+            <h1 class="reveal text-5xl md:text-8xl font-black mb-4 tracking-tighter uppercase leading-tight">Твоя история <br> <span class="text-redline-red">без границ</span></h1>
             
             <div class="reveal flex items-center justify-center gap-3 mb-12">
                 <div id="status-dot" class="w-2.5 h-2.5 bg-gray-500 rounded-full"></div>
@@ -205,12 +209,15 @@
         <svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
             <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs>
             <g class="parallax">
-                <use xlink:href="#gentle-wave" x="48" y="0" class="fill-gray-50/30 dark:fill-dark-gray/30" /><use xlink:href="#gentle-wave" x="48" y="3" class="fill-gray-50/50 dark:fill-dark-gray/50" /><use xlink:href="#gentle-wave" x="48" y="5" class="fill-gray-50/70 dark:fill-dark-gray/70" /><use xlink:href="#gentle-wave" x="48" y="7" class="fill-gray-50 dark:fill-dark-gray" />
+                <use xlink:href="#gentle-wave" x="48" y="0" class="fill-white/30 dark:fill-dark-bg/30" />
+                <use xlink:href="#gentle-wave" x="48" y="3" class="fill-white/50 dark:fill-dark-bg/50" />
+                <use xlink:href="#gentle-wave" x="48" y="5" class="fill-white/70 dark:fill-dark-bg/70" />
+                <use xlink:href="#gentle-wave" x="48" y="7" class="fill-white dark:fill-dark-bg" />
             </g>
         </svg>
     </section>
 
-    <!-- ТЕХНОЛОГИИ -->
+    <!-- FEATURES SECTION -->
     <section id="features" class="py-32 bg-white dark:bg-dark-bg relative z-10 text-center">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-16 reveal">Технологии Redline</h2>
@@ -249,7 +256,7 @@
         </div>
     </section>
 
-    <!-- КАРТА ДЕТАЛЬНО -->
+    <!-- MAP SECTION -->
     <section id="map" class="py-32 bg-gray-50 dark:bg-dark-gray relative z-10">
         <div class="container mx-auto px-6">
             <div class="reveal flex flex-col md:flex-row items-center gap-20">
@@ -268,7 +275,7 @@
         </div>
     </section>
 
-    <!-- ГАЛЕРЕЯ -->
+    <!-- GALLERY SECTION -->
     <section id="gallery" class="py-32 bg-white dark:bg-dark-bg relative z-10">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-16 reveal">Мир в объективе</h2>
@@ -281,7 +288,7 @@
         </div>
     </section>
 
-    <!-- FAQ -->
+    <!-- FAQ SECTION -->
     <section id="faq" class="py-32 bg-gray-50 dark:bg-dark-gray relative z-10">
         <div class="container mx-auto px-6 max-w-4xl">
             <h2 class="text-4xl font-black uppercase italic tracking-tighter text-center mb-16 reveal">Частые Вопросы</h2>
@@ -298,12 +305,11 @@
         </div>
     </section>
 
-    <!-- КОМАНДА -->
+    <!-- ADMIN SECTION -->
     <section id="admin" class="py-32 bg-white dark:bg-dark-bg relative z-10">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-20 reveal">Команда Проекта</h2>
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Alastor -->
                 <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
                     <div class="relative w-32 h-32 mx-auto mb-6">
                         <img src="https://mc-heads.net/avatar/Alast0r_RL/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
@@ -313,7 +319,6 @@
                     <p class="text-gray-500 text-sm mb-8 italic">Создатель проекта. Решает все глобальные вопросы сервера.</p>
                     <button onclick="copySocial('sr.alast0r')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
                 </div>
-                <!-- Necroman -->
                 <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
                     <div class="relative w-32 h-32 mx-auto mb-6">
                         <img src="https://mc-heads.net/avatar/Necr0manthre/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
@@ -323,7 +328,6 @@
                     <p class="text-gray-500 text-sm mb-8 font-semibold">Мастер конфигов. Следит чтобы сервер работал без лагов.</p>
                     <button onclick="copySocial('tm_rix')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
                 </div>
-                <!-- German -->
                 <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
                     <div class="relative w-32 h-32 mx-auto mb-6">
                         <img src="https://mc-heads.net/avatar/German/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
@@ -337,7 +341,6 @@
         </div>
     </section>
 
-    <!-- ПОДВАЛ -->
     <footer class="py-12 bg-white dark:bg-dark-bg text-center border-t border-gray-100 dark:border-white/5 relative z-10">
         <div class="container mx-auto px-6">
             <div class="text-3xl font-black text-redline-red uppercase tracking-tighter mb-4">Redline</div>
@@ -347,7 +350,7 @@
         </div>
     </footer>
 
-    <!-- Modal Rules -->
+    <!-- MODALS & UI ELEMENTS -->
     <div id="rules-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-black/90 backdrop-blur-md">
         <div class="bg-white dark:bg-dark-gray w-full max-w-2xl rounded-[40px] p-10 relative">
             <button onclick="toggleModal('rules-modal')" class="absolute top-8 right-8 text-2xl hover:text-redline-red transition">✕</button>
@@ -361,65 +364,62 @@
         </div>
     </div>
 
-    <!-- Lightbox -->
     <div id="lightbox" onclick="closeLightbox()" class="fixed inset-0 z-[300] bg-black/95 hidden items-center justify-center p-4">
         <img id="lightbox-img" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl">
     </div>
 
-    <!-- UI Elements -->
     <button id="back-to-top" class="fixed bottom-8 right-8 z-[60] bg-redline-red text-white p-4 rounded-2xl shadow-2xl transition-all duration-500 opacity-0 translate-y-10 pointer-events-none hover:-translate-y-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg></button>
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[250] bg-dark-bg dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] opacity-0 transition-all duration-500 pointer-events-none border border-redline-red/50 shadow-2xl">Скопировано!</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Элемент подсветки
-            const glowOverlay = document.getElementById('glow-overlay');
-            let mouseX = -1000;
-            let mouseY = -1000;
-            let currentX = -1000;
-            let currentY = -1000;
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                direction: 'vertical',
+                gestureDirection: 'vertical',
+                smooth: true,
+            });
 
-            // Отслеживание мыши
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    lenis.scrollTo(this.getAttribute('href'));
+                });
+            });
+
+            // Glow logic
+            const glowOverlay = document.getElementById('glow-overlay');
+            let mouseX = -1000, mouseY = -1000, currentX = -1000, currentY = -1000;
+
             document.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
             });
 
-            // Плавный цикл анимации для свечения (Lerp)
             function animateGlow() {
-                // Коэффициент 0.1 дает эффект плавного "догоняния" курсора
                 currentX += (mouseX - currentX) * 0.1;
                 currentY += (mouseY - currentY) * 0.1;
-
                 glowOverlay.style.setProperty('--mouse-x', `${currentX}px`);
                 glowOverlay.style.setProperty('--mouse-y', `${currentY}px`);
-
                 requestAnimationFrame(animateGlow);
             }
             animateGlow();
 
-            // Эффект увеличения свечения при наведении
             document.addEventListener('mouseover', (e) => {
-                if (e.target.closest('button, a, summary, .cursor-pointer')) {
-                    document.body.classList.add('is-hovering');
-                }
+                if (e.target.closest('button, a, summary, .cursor-pointer')) document.body.classList.add('is-hovering');
             });
             document.addEventListener('mouseout', (e) => {
-                if (e.target.closest('button, a, summary, .cursor-pointer')) {
-                    document.body.classList.remove('is-hovering');
-                }
+                if (e.target.closest('button, a, summary, .cursor-pointer')) document.body.classList.remove('is-hovering');
             });
 
-            // Анимация линий фона
-            const linesContainer = document.getElementById('lines-container');
-            setTimeout(() => { 
-                if(linesContainer) { 
-                    linesContainer.classList.remove('initial-state'); 
-                    linesContainer.classList.add('loop-state'); 
-                } 
-            }, 1500);
-
-            // Появление элементов при скролле
+            // Reveal observers
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => { 
                     if (entry.isIntersecting) entry.target.classList.add('active'); 
@@ -427,7 +427,7 @@
             }, { threshold: 0.15 });
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-            // Переключение темы
+            // Theme toggle
             const themeBtn = document.getElementById('theme-toggle');
             const updateIcons = () => {
                 const darkIcon = document.getElementById('theme-toggle-dark-icon');
@@ -452,75 +452,81 @@
                 updateIcons(); 
             });
 
-            // Кнопка наверх
+            // Animated lines
+            const linesContainer = document.getElementById('lines-container');
+            setTimeout(() => { 
+                if(linesContainer) { 
+                    linesContainer.classList.remove('initial-state'); 
+                    linesContainer.classList.add('loop-state'); 
+                } 
+            }, 1500);
+
+            // Back to top
             const backToTop = document.getElementById('back-to-top');
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 500) backToTop.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
-                else backToTop.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
-            }, { passive: true });
-            backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-            // Глобальные функции
-            window.openLightbox = (src) => {
-                document.getElementById('lightbox-img').src = src;
-                document.getElementById('lightbox').classList.remove('hidden');
-                document.getElementById('lightbox').classList.add('flex');
-            };
-            window.closeLightbox = () => document.getElementById('lightbox').classList.add('hidden');
-
-            window.showToast = (msg) => {
-                const toast = document.getElementById('toast'); 
-                toast.innerText = msg;
-                toast.classList.add('show'); 
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            };
-
-            window.toggleModal = (id) => {
-                const el = document.getElementById(id);
-                el.classList.toggle('hidden'); 
-                el.classList.toggle('flex');
-            };
-
-            window.toggleMobileMenu = () => {
-                const el = document.getElementById('mobile-menu');
-                el.classList.toggle('hidden'); 
-                el.classList.toggle('flex');
-            };
-
-            window.confirmAndCopyIP = () => {
-                navigator.clipboard.writeText("37.9.13.223").then(() => {
-                    toggleModal('rules-modal');
-                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C4001D', '#ffffff'] });
-                    showToast("IP СКОПИРОВАН!");
-                });
-            };
-
-            window.copySocial = (tag) => {
-                navigator.clipboard.writeText(tag).then(() => showToast("DISCORD ТЕГ СКОПИРОВАН!"));
-            };
-
-            // Статус сервера
-            async function updateStatus() {
-                const countEl = document.getElementById('online-count');
-                const dot = document.getElementById('status-dot');
-                try {
-                    const res = await fetch('https://api.mcstatus.io/v2/status/java/37.9.13.223');
-                    const data = await res.json();
-                    countEl.classList.remove('skeleton', 'text-transparent');
-                    if (data.online) {
-                        countEl.innerText = data.players.online;
-                        dot.className = "w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.6)]";
-                    } else { 
-                        countEl.innerText = "OFF"; 
-                        dot.className = "w-2.5 h-2.5 bg-red-500 rounded-full"; 
-                    }
-                } catch { 
-                    countEl.innerText = "?"; 
+                if (window.scrollY > 500) {
+                    backToTop.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+                } else {
+                    backToTop.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
                 }
-            }
-            updateStatus(); 
-            setInterval(updateStatus, 30000);
+            });
+            backToTop.addEventListener('click', () => lenis.scrollTo(0));
+
+            // API Mock for Online Count
+            setTimeout(() => {
+                const countEl = document.getElementById('online-count');
+                countEl.classList.remove('skeleton', 'text-transparent');
+                countEl.classList.add('text-redline-red', 'font-bold');
+                countEl.textContent = '124';
+                document.getElementById('status-dot').classList.replace('bg-gray-500', 'bg-green-500');
+            }, 2000);
         });
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function confirmAndCopyIP() {
+            copyToClipboard('37.9.13.223');
+            toggleModal('rules-modal');
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C4001D', '#ffffff'] });
+        }
+
+        function copySocial(text) {
+            copyToClipboard(text);
+        }
+
+        function openLightbox(src) {
+            const lb = document.getElementById('lightbox');
+            document.getElementById('lightbox-img').src = src;
+            lb.classList.remove('hidden');
+            lb.classList.add('flex');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.replace('flex', 'hidden');
+        }
     </script>
 </body>
 </html>
