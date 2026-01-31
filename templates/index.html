@@ -100,7 +100,7 @@
         }
         /* Темная тема: Сделана темнее (уменьшена прозрачность наложения) */
         .dark .hero-background {
-            background-image: linear-gradient(rgba(10, 10, 10, 0.85), rgba(5, 5, 5, 0.92)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(5, 5, 5, 0.92)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
         }
 
         .blob {
@@ -160,7 +160,9 @@
                 
                 <button id="theme-toggle" class="p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:rotate-12 transition">
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+</svg>
                 </button>
             </div>
 
@@ -260,33 +262,97 @@
     <section id="map" class="py-32 bg-gray-50 dark:bg-dark-gray relative z-10">
         <div class="container mx-auto px-6">
             <div class="reveal flex flex-col md:flex-row items-center gap-20">
-                <div class="md:w-1/2 relative group overflow-hidden rounded-[40px] shadow-2xl">
-                    <img src="https://files.catbox.moe/k2hsm4.jpg" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-105 transition duration-700">
+                <div class="md:w-1/2 relative group overflow-hidden rounded-[40px] shadow-2xl border border-gray-100 dark:border-white/5">
+                    <img src="static/map.jpg" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-110 transition duration-700" alt="Map">
+                    <div class="absolute inset-0 bg-redline-red/10 group-hover:bg-transparent transition"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500 bg-black/40">
-                        <a href="http://37.9.13.223:30471/" target="_blank" class="bg-redline-red text-white font-black py-5 px-10 rounded-2xl shadow-2xl uppercase tracking-widest">Открыть BlueMap</a>
+                        <a href="http://37.9.13.223:30471/#world:0:0:0:1500:0:0:0:0:perspective" target="_blank" class="bg-white text-black font-black py-4 px-8 rounded-2xl shadow-2xl hover:scale-110 transition uppercase tracking-widest">Открыть карту</a>
                     </div>
                 </div>
-                <div class="md:w-1/2">
+                
+                <div class="md:w-1/2 text-left">
                     <h2 class="text-4xl font-black mb-8 uppercase italic tracking-tighter">Живая 3D карта</h2>
-                    <p class="text-xl text-gray-500 mb-6 leading-relaxed">Следи за миром в реальном времени. Найди поселения игроков прямо в браузере.</p>
-                    <code class="text-redline-red font-bold text-lg p-4 bg-white dark:bg-white/5 rounded-2xl border border-dashed border-redline-red/30 block w-fit">37.9.13.223:30471</code>
+                    <p class="text-xl text-gray-500 mb-6 leading-relaxed">Следи за миром в реальном времени. Найди поселения игроков или разведай новые территории прямо в браузере.</p>
+                    
+                    <div class="p-6 bg-white dark:bg-white/5 rounded-3xl border border-dashed border-gray-300 dark:border-white/10 mb-10 inline-block">
+                        <p class="text-[10px] uppercase tracking-[0.2em] font-black opacity-40 mb-2">Прямой доступ:</p>
+                        <code class="text-redline-red font-bold break-all tracking-widest text-lg">37.9.13.223:30471</code>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                         <span class="flex h-3 w-3 relative">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-redline-red opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-redline-red"></span>
+                        </span>
+                        <span class="text-xs font-black uppercase tracking-widest opacity-60">Обновляется в реальном времени</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+<!-- GALLERY SECTION -->
+<section id="gallery" class="py-32 bg-white dark:bg-dark-bg relative z-10 overflow-hidden select-none">
+    <div class="container mx-auto px-4 text-center relative">
+        <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-16 reveal">Галерея</h2>
+        
+        <!-- Контейнер слайдера (добавлен padding для стрелок на ПК) -->
+        <div class="relative px-0 md:px-4 group max-w-6xl mx-auto">
+            
+            <!-- Кнопка НАЗАД (Галерея) -->
+            <!-- На ПК (md) смещаем влево на -16 единиц, чтобы была снаружи -->
+            <button id="prevBtn" class="absolute left-2 md:-left-16 top-1/2 -translate-y-1/2 z-30 bg-white/10 backdrop-blur-md md:bg-transparent text-white md:text-gray-400 md:hover:text-redline-red p-3 md:p-4 rounded-full md:rounded-none transition-all hover:scale-110 active:scale-95">
+                <svg class="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
 
-    <!-- GALLERY SECTION -->
-    <section id="gallery" class="py-32 bg-white dark:bg-dark-bg relative z-10">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-16 reveal">Мир в объективе</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <img src="https://files.catbox.moe/k2hsm4.jpg" onclick="openLightbox(this.src)" class="reveal aspect-video rounded-3xl object-cover hover:scale-105 transition-all duration-500 shadow-lg cursor-pointer">
-                <img src="https://files.catbox.moe/k2hsm4.jpg" onclick="openLightbox(this.src)" class="reveal aspect-video rounded-3xl object-cover hover:scale-105 transition-all duration-500 shadow-lg cursor-pointer">
-                <img src="https://files.catbox.moe/k2hsm4.jpg" onclick="openLightbox(this.src)" class="reveal aspect-video rounded-3xl object-cover hover:scale-105 transition-all duration-500 shadow-lg cursor-pointer">
-                <img src="https://files.catbox.moe/k2hsm4.jpg" onclick="openLightbox(this.src)" class="reveal aspect-video rounded-3xl object-cover hover:scale-105 transition-all duration-500 shadow-lg cursor-pointer">
+            <!-- Окно просмотра (маска) -->
+            <div class="overflow-hidden w-full rounded-3xl ring-1 ring-black/5 dark:ring-white/10" id="gallery-viewport">
+                <!-- Трек -->
+                <div id="gallery-track" class="flex gap-4 md:gap-6 will-change-transform">
+                    <!-- JS вставит фото сюда -->
+                </div>
             </div>
+
+            <!-- Кнопка ВПЕРЕД (Галерея) -->
+            <!-- На ПК (md) смещаем вправо на -16 единиц -->
+            <button id="nextBtn" class="absolute right-2 md:-right-16 top-1/2 -translate-y-1/2 z-30 bg-white/10 backdrop-blur-md md:bg-transparent text-white md:text-gray-400 md:hover:text-redline-red p-3 md:p-4 rounded-full md:rounded-none transition-all hover:scale-110 active:scale-95">
+                <svg class="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+            </button>
         </div>
-    </section>
+        
+        <p class="mt-8 text-gray-400 text-xs font-bold tracking-widest uppercase opacity-60">
+            Нажми на фото для увеличения
+        </p>
+    </div>
+</section>
+
+<!-- ИСПРАВЛЕННЫЙ LIGHTBOX -->
+<div id="lightbox" class="fixed inset-0 z-[300] bg-black/95 hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300 backdrop-blur-sm">
+    
+    <!-- Кнопка Закрыть -->
+    <button onclick="closeLightbox()" class="absolute top-6 right-6 text-gray-400 hover:text-white transition z-[310] p-2 bg-black/20 rounded-full hover:bg-redline-red/20">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+
+    <!-- Кнопка Назад (Лайтбокс) -->
+    <button onclick="changeLightboxImage('prev')" class="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 text-white/50 hover:text-white hover:scale-110 p-4 transition z-[310]">
+        <svg class="w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+
+    <!-- Картинка (Центрирование и размеры) -->
+    <div class="relative w-full h-full flex items-center justify-center p-4 md:p-12 pointer-events-none">
+        <img id="lightbox-img" src="" class="max-w-full max-h-full w-auto h-auto rounded-lg shadow-2xl object-contain pointer-events-auto transition-all duration-300">
+    </div>
+
+    <!-- Кнопка Вперед (Лайтбокс) -->
+    <button onclick="changeLightboxImage('next')" class="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 text-white/50 hover:text-white hover:scale-110 p-4 transition z-[310]">
+        <svg class="w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+    </button>
+    
+    <!-- Подпись (счетчик) -->
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-gray-400 font-mono text-sm tracking-widest bg-black/50 px-4 py-1 rounded-full border border-white/10">
+        <span id="lb-current" class="text-white font-bold">1</span> / <span id="lb-total">1</span>
+    </div>
+</div>
 
     <!-- FAQ SECTION -->
     <section id="faq" class="py-32 bg-gray-50 dark:bg-dark-gray relative z-10">
@@ -334,7 +400,7 @@
                         <div class="absolute -bottom-2 -right-2 bg-green-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Персонал</div>
                     </div>
                     <h3 class="text-2xl font-black uppercase mb-2">German</h3>
-                    <p class="text-gray-500 text-sm mb-8 italic">Душа компании. Отвечает за атмосферу и общение.</p>
+                    <p class="text-gray-500 text-sm mb-8 italic">Он тут просто по блату и ничего не делает.</p>
                     <button onclick="copySocial('german_top')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
                 </div>
             </div>
@@ -527,6 +593,203 @@
         function closeLightbox() {
             document.getElementById('lightbox').classList.replace('flex', 'hidden');
         }
+
+
+
+
+
+
+
+
+// --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+    let galleryImages = []; // Список всех найденных фото
+    let currentLightboxIndex = 0;
+
+    const GALLERY_CONFIG = {
+        folder: 'static/gallery/',
+        maxCheck: 50,
+        extensions: ['jpg', 'png', 'jpeg', 'webp']
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const track = document.getElementById('gallery-track');
+        
+        // 1. ПОИСК ФАЙЛОВ
+        for (let i = 1; i <= GALLERY_CONFIG.maxCheck; i++) {
+            let found = false;
+            for (let ext of GALLERY_CONFIG.extensions) {
+                const src = `${GALLERY_CONFIG.folder}${i}.${ext}`;
+                if (await imageExists(src)) {
+                    galleryImages.push(src);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) break;
+        }
+
+        // 2. ЗАПОЛНЕНИЕ ГАЛЕРЕИ
+        if (galleryImages.length > 0) {
+            // Обновляем счетчик лайтбокса
+            document.getElementById('lb-total').innerText = galleryImages.length;
+
+            // Рендерим элементы
+            galleryImages.forEach((src, index) => createGalleryItem(src, index));
+            
+            // Дублируем для бесконечности (если картинок мало)
+            while (track.children.length < 10 && galleryImages.length > 0) {
+                galleryImages.forEach((src, index) => createGalleryItem(src, index));
+            }
+        }
+
+        // Вспомогательные функции
+        function imageExists(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        function createGalleryItem(src, originalIndex) {
+            const div = document.createElement('div');
+            // Адаптивная ширина: Mobile: 100%, Tablet: 50%, Desktop: 25% (4 шт в ряд)
+            div.className = "flex-shrink-0 w-full md:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] aspect-video transition-transform duration-300 group/item relative overflow-hidden rounded-3xl";
+            
+            div.innerHTML = `
+                <img src="${src}" class="w-full h-full object-cover transition duration-700 group-hover/item:scale-110 group-hover/item:brightness-75 cursor-pointer">
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition duration-300">
+                    <div class="bg-redline-red/80 text-white p-3 rounded-full backdrop-blur-sm shadow-xl transform scale-50 group-hover/item:scale-100 transition duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                    </div>
+                </div>
+            `;
+            
+            // Клик открывает лайтбокс по ОРИГИНАЛЬНОМУ индексу
+            div.onclick = () => openLightbox(originalIndex);
+            track.appendChild(div);
+        }
+
+        // 3. ЛОГИКА СТРЕЛОК ГАЛЕРЕИ
+        let isAnimating = false;
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        function slideGallery(direction) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const firstItem = track.firstElementChild;
+            const itemWidth = firstItem.offsetWidth;
+            const gap = parseInt(window.getComputedStyle(track).gap) || 0;
+            const moveAmount = itemWidth + gap;
+
+            if (direction === 'next') {
+                track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                track.style.transform = `translateX(-${moveAmount}px)`;
+                setTimeout(() => {
+                    track.style.transition = 'none';
+                    track.appendChild(firstItem);
+                    track.style.transform = 'translateX(0)';
+                    isAnimating = false;
+                }, 500);
+            } else {
+                const lastItem = track.lastElementChild;
+                track.style.transition = 'none';
+                track.prepend(lastItem);
+                track.style.transform = `translateX(-${moveAmount}px)`;
+                void track.offsetWidth; // Force reflow
+                track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                track.style.transform = 'translateX(0)';
+                setTimeout(() => isAnimating = false, 500);
+            }
+        }
+
+        nextBtn.addEventListener('click', () => slideGallery('next'));
+        prevBtn.addEventListener('click', () => slideGallery('prev'));
+    });
+
+    // --- ФУНКЦИИ ЛАЙТБОКСА (ИСПРАВЛЕННЫЕ) ---
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lbCounter = document.getElementById('lb-current');
+
+    function openLightbox(index) {
+        if (index >= galleryImages.length) index = 0;
+        currentLightboxIndex = index;
+        updateLightboxContent();
+        
+        // ВАЖНО: Сначала убираем hidden, потом добавляем flex для центрирования
+        lightbox.classList.remove('hidden');
+        lightbox.classList.add('flex'); 
+        
+        // Небольшая задержка для анимации прозрачности
+        setTimeout(() => {
+            lightbox.classList.remove('opacity-0');
+            lightboxImg.classList.remove('scale-90');
+            lightboxImg.classList.add('scale-100');
+        }, 10);
+        
+        document.body.style.overflow = 'hidden'; // Блокируем скролл страницы
+    }
+
+    function closeLightbox() {
+        lightbox.classList.add('opacity-0');
+        lightboxImg.classList.remove('scale-100');
+        lightboxImg.classList.add('scale-90'); // Эффект уменьшения при закрытии
+        
+        setTimeout(() => {
+            // Возвращаем классы как было
+            lightbox.classList.remove('flex');
+            lightbox.classList.add('hidden');
+            document.body.style.overflow = ''; 
+        }, 300);
+    }
+
+    function changeLightboxImage(direction) {
+        if (direction === 'next') {
+            currentLightboxIndex++;
+            if (currentLightboxIndex >= galleryImages.length) currentLightboxIndex = 0;
+        } else {
+            currentLightboxIndex--;
+            if (currentLightboxIndex < 0) currentLightboxIndex = galleryImages.length - 1;
+        }
+        
+        // Быстрая анимация смены
+        lightboxImg.style.opacity = '0.5';
+        lightboxImg.style.transform = 'scale(0.98)';
+        
+        setTimeout(() => {
+            updateLightboxContent();
+            lightboxImg.style.opacity = '1';
+            lightboxImg.style.transform = 'scale(1)';
+        }, 150);
+    }
+
+    function updateLightboxContent() {
+        lightboxImg.src = galleryImages[currentLightboxIndex];
+        lbCounter.innerText = currentLightboxIndex + 1;
+    }
+
+    // Закрытие по клику на фон (проверяем, что кликнули не на картинку и не на кнопки)
+    lightbox.addEventListener('click', (e) => {
+        // Если кликнули по самому контейнеру или по обертке картинки
+        if (e.target === lightbox || e.target.closest('.pointer-events-none')) {
+            closeLightbox();
+        }
+    });
+
+    // Управление с клавиатуры осталось прежним
+    document.addEventListener('keydown', (e) => {
+        if (lightbox.classList.contains('hidden')) return;
+        
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowRight') changeLightboxImage('next');
+        if (e.key === 'ArrowLeft') changeLightboxImage('prev');
+    });
+
+        
     </script>
 </body>
 </html>
