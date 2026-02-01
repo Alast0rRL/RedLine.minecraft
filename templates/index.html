@@ -156,6 +156,7 @@
                 <a href="#features" class="nav-link hover:text-redline-red transition">Технологии</a>
                 <a href="#map" class="nav-link hover:text-redline-red transition">Карта</a>
                 <a href="#gallery" class="nav-link hover:text-redline-red transition">Галерея</a>
+                <a href="#admin" class="nav-link hover:text-redline-red transition">Команда</a>
                 <a href="#faq" class="nav-link hover:text-redline-red transition">F.A.Q</a>
                 
                 <button id="theme-toggle" class="p-2 rounded-xl bg-gray-100 dark:bg-white/5 hover:rotate-12 transition">
@@ -177,6 +178,7 @@
         <a href="#features" class="nav-link" onclick="toggleMobileMenu()">Технологии</a>
         <a href="#map" class="nav-link" onclick="toggleMobileMenu()">Карта</a>
         <a href="#gallery" class="nav-link" onclick="toggleMobileMenu()">Галерея</a>
+        <a href="#admin" class="nav-link" onclick="toggleMobileMenu()">Команда</a>
         <a href="#faq" class="nav-link" onclick="toggleMobileMenu()">F.A.Q</a>
     </div>
 
@@ -354,6 +356,44 @@
     </div>
 </div>
 
+
+
+    <!-- ADMIN SECTION -->
+    <section id="admin" class="py-32 bg-white dark:bg-dark-bg relative z-10">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-20 reveal">Команда Проекта</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
+                    <div class="relative w-32 h-32 mx-auto mb-6">
+                        <img src="https://mc-heads.net/avatar/Alast0r_RL/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-redline-red text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Руководитель</div>
+                    </div>
+                    <h3 class="text-2xl font-black text-redline-red uppercase mb-2">Alast0r_RL</h3>
+                    <p class="text-gray-500 text-sm mb-8 italic">Руководитель проекта. Решает все глобальные вопросы сервера.</p>
+                    <button onclick="copySocial('sr.alast0r')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
+                </div>
+                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
+                    <div class="relative w-32 h-32 mx-auto mb-6">
+                        <img src="https://mc-heads.net/avatar/Necr0manthre/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Тех. Админ</div>
+                    </div>
+                    <h3 class="text-2xl font-black uppercase mb-2">Necr0manthre</h3>
+                    <p class="text-gray-500 text-sm mb-8 font-semibold">Мастер консоли. Следит чтобы сервер работал без лагов и багов. Если сервер упал или лагает, это всё он виноват </p>
+                    <button onclick="copySocial('tm_rix')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
+                </div>
+                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
+                    <div class="relative w-32 h-32 mx-auto mb-6">
+                        <img src="https://mc-heads.net/avatar/German/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
+                        <div class="absolute -bottom-2 -right-2 bg-green-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Персонал</div>
+                    </div>
+                    <h3 class="text-2xl font-black uppercase mb-2">German</h3>
+                    <p class="text-gray-500 text-sm mb-8 italic">Он тут просто по блату и ничего не делает.</p>
+                    <button onclick="copySocial('Он сам тебе напишет')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- FAQ SECTION -->
     <section id="faq" class="py-32 bg-gray-50 dark:bg-dark-gray relative z-10">
         <div class="container mx-auto px-6 max-w-4xl">
@@ -371,42 +411,6 @@
         </div>
     </section>
 
-    <!-- ADMIN SECTION -->
-    <section id="admin" class="py-32 bg-white dark:bg-dark-bg relative z-10">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-4xl font-black uppercase italic tracking-tighter mb-20 reveal">Команда Проекта</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
-                    <div class="relative w-32 h-32 mx-auto mb-6">
-                        <img src="https://mc-heads.net/avatar/Alast0r_RL/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
-                        <div class="absolute -bottom-2 -right-2 bg-redline-red text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Руководитель</div>
-                    </div>
-                    <h3 class="text-2xl font-black text-redline-red uppercase mb-2">Alast0r_RL</h3>
-                    <p class="text-gray-500 text-sm mb-8 italic">Создатель проекта. Решает все глобальные вопросы сервера.</p>
-                    <button onclick="copySocial('sr.alast0r')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
-                </div>
-                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
-                    <div class="relative w-32 h-32 mx-auto mb-6">
-                        <img src="https://mc-heads.net/avatar/Necr0manthre/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
-                        <div class="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Тех. Админ</div>
-                    </div>
-                    <h3 class="text-2xl font-black uppercase mb-2">Necr0manthre</h3>
-                    <p class="text-gray-500 text-sm mb-8 font-semibold">Мастер конфигов. Следит чтобы сервер работал без лагов.</p>
-                    <button onclick="copySocial('tm_rix')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
-                </div>
-                <div class="reveal p-10 bg-gray-50 dark:bg-dark-gray/40 backdrop-blur-md rounded-[40px] border border-gray-100 dark:border-white/5 hover:border-redline-red transition-all duration-500 group text-center">
-                    <div class="relative w-32 h-32 mx-auto mb-6">
-                        <img src="https://mc-heads.net/avatar/German/128" class="w-full h-full rounded-3xl shadow-xl group-hover:scale-110 transition duration-500 relative z-10">
-                        <div class="absolute -bottom-2 -right-2 bg-green-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase z-20">Персонал</div>
-                    </div>
-                    <h3 class="text-2xl font-black uppercase mb-2">German</h3>
-                    <p class="text-gray-500 text-sm mb-8 italic">Он тут просто по блату и ничего не делает.</p>
-                    <button onclick="copySocial('german_top')" class="w-full py-4 bg-white dark:bg-white/5 rounded-2xl hover:bg-redline-red hover:text-white transition font-bold text-xs uppercase tracking-widest">Discord</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <footer class="py-12 bg-white dark:bg-dark-bg text-center border-t border-gray-100 dark:border-white/5 relative z-10">
         <div class="container mx-auto px-6">
             <div class="text-3xl font-black text-redline-red uppercase tracking-tighter mb-4">Redline</div>
@@ -415,6 +419,14 @@
             </p>
         </div>
     </footer>
+
+
+
+
+
+
+
+
 
     <!-- MODALS & UI ELEMENTS -->
     <div id="rules-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-black/90 backdrop-blur-md">
