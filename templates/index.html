@@ -550,14 +550,39 @@
             });
             backToTop.addEventListener('click', () => lenis.scrollTo(0));
 
-            // API Mock for Online Count
-            setTimeout(() => {
-                const countEl = document.getElementById('online-count');
-                countEl.classList.remove('skeleton', 'text-transparent');
-                countEl.classList.add('text-redline-red', 'font-bold');
-                countEl.textContent = '124';
-                document.getElementById('status-dot').classList.replace('bg-gray-500', 'bg-green-500');
-            }, 2000);
+            // Реальное получение онлайна
+async function updateOnlineStatus() {
+    const countEl = document.getElementById('online-count');
+    const statusDot = document.getElementById('status-dot');
+    const IP = '37.9.13.223:30315';
+
+    try {
+        const response = await fetch(`https://api.mcstatus.io/v2/status/java/${IP}`);
+        const data = await response.json();
+
+        // Убираем скелетон-анимацию
+        countEl.classList.remove('skeleton', 'text-transparent');
+        countEl.classList.add('text-redline-red', 'font-bold');
+
+        if (data.online) {
+            // Если сервер в сети
+            countEl.textContent = data.players.online;
+            statusDot.classList.replace('bg-gray-500', 'bg-green-500');
+        } else {
+            // Если сервер выключен
+            countEl.textContent = 'OFF';
+            statusDot.classList.replace('bg-gray-500', 'bg-red-500');
+        }
+    } catch (error) {
+        console.error('Ошибка API:', error);
+        countEl.textContent = '?';
+    }
+}
+
+// Запускаем при загрузке
+updateOnlineStatus();
+// Опционально: обновлять каждые 2 минуты
+setInterval(updateOnlineStatus, 120000);
         });
 
         function toggleMobileMenu() {
