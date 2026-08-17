@@ -3,7 +3,7 @@ from mcstatus import JavaServer
 
 # Замени на IP своего сервера. 
 # Если сервера пока нет, используй 'mc.hypixel.net' для тестов, чтобы видеть цифры.
-MC_SERVER_IP = "play.redline.gg" 
+MC_SERVER_IP = "redline.necr0manth.dev" 
 
 async def get_minecraft_status():
     try:

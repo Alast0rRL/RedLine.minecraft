@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Redline | 37.9.13.223:30315</title>
+    <title>Redline | redline.necr0manth.dev</title>
     <meta name="description" content="Redline - классическое выживание без вайпов на мощном железе.">
     <meta property="og:title" content="Redline Minecraft Server">
     <meta property="og:image" content="https://files.catbox.moe/k2hsm4.jpg">
@@ -197,7 +197,7 @@
             
             <div class="reveal flex items-center justify-center gap-3 mb-12">
                 <div id="status-dot" class="w-2.5 h-2.5 bg-gray-500 rounded-full"></div>
-                <div class="font-mono text-sm tracking-widest uppercase"><span id="online-count" class="px-6 py-1 rounded-md text-transparent skeleton">-</span> <span class="opacity-50">/ 500 Online</span></div>
+                <div class="font-mono text-sm tracking-widest uppercase"><span id="online-count" class="px-6 py-1 rounded-md text-transparent skeleton">-</span> <span class="opacity-50">/ <span id="online-max">500</span> Online</span></div>
             </div>
 
             <div class="reveal flex flex-col md:flex-row items-center justify-center gap-6 relative z-50">
@@ -268,7 +268,7 @@
                     <img src="static/map.jpg" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-110 transition duration-700" alt="Map">
                     <div class="absolute inset-0 bg-redline-red/10 group-hover:bg-transparent transition"></div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500 bg-black/40">
-                        <a href="http://37.9.13.223:30471/#world:0:0:0:1500:0:0:0:0:perspective" target="_blank" class="bg-white text-black font-black py-4 px-8 rounded-2xl shadow-2xl hover:scale-110 transition uppercase tracking-widest">Открыть карту</a>
+                        <a href="https://redline.surf/map/#world:0:0:0:1500:0:0:0:0:perspective" target="_blank" class="bg-white text-black font-black py-4 px-8 rounded-2xl shadow-2xl hover:scale-110 transition uppercase tracking-widest">Открыть карту</a>
                     </div>
                 </div>
                 
@@ -278,7 +278,7 @@
                     
                     <div class="p-6 bg-white dark:bg-white/5 rounded-3xl border border-dashed border-gray-300 dark:border-white/10 mb-10 inline-block">
                         <p class="text-[10px] uppercase tracking-[0.2em] font-black opacity-40 mb-2">Прямой доступ:</p>
-                        <code class="text-redline-red font-bold break-all tracking-widest text-lg">37.9.13.223:30471</code>
+                        <code class="text-redline-red font-bold break-all tracking-widest text-lg">redline.surf/map</code>
                     </div>
                     
                     <div class="flex items-center gap-4">
@@ -554,10 +554,10 @@
 async function updateOnlineStatus() {
     const countEl = document.getElementById('online-count');
     const statusDot = document.getElementById('status-dot');
-    const IP = '37.9.13.223:30315';
+    const maxEl = document.getElementById('online-max');
 
     try {
-        const response = await fetch(`https://api.mcstatus.io/v2/status/java/${IP}`);
+        const response = await fetch('/api/status');
         const data = await response.json();
 
         // Убираем скелетон-анимацию
@@ -566,7 +566,8 @@ async function updateOnlineStatus() {
 
         if (data.online) {
             // Если сервер в сети
-            countEl.textContent = data.players.online;
+            countEl.textContent = data.players;
+            if (maxEl) maxEl.textContent = data.max_players;
             statusDot.classList.replace('bg-gray-500', 'bg-green-500');
         } else {
             // Если сервер выключен
@@ -611,7 +612,7 @@ setInterval(updateOnlineStatus, 120000);
         }
 
         function confirmAndCopyIP() {
-            copyToClipboard('37.9.13.223:30315');
+            copyToClipboard('redline.necr0manth.dev');
             toggleModal('rules-modal');
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C4001D', '#ffffff'] });
         }
