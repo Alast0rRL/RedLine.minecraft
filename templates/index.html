@@ -442,10 +442,6 @@
         </div>
     </div>
 
-    <div id="lightbox" onclick="closeLightbox()" class="fixed inset-0 z-[300] bg-black/95 hidden items-center justify-center p-4">
-        <img id="lightbox-img" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl">
-    </div>
-
     <button id="back-to-top" class="fixed bottom-8 right-8 z-[60] bg-redline-red text-white p-4 rounded-2xl shadow-2xl transition-all duration-500 opacity-0 translate-y-10 pointer-events-none hover:-translate-y-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg></button>
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[250] bg-dark-bg dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] opacity-0 transition-all duration-500 pointer-events-none border border-redline-red/50 shadow-2xl">Скопировано!</div>
 
@@ -621,17 +617,6 @@ setInterval(updateOnlineStatus, 120000);
             copyToClipboard(text);
         }
 
-        function openLightbox(src) {
-            const lb = document.getElementById('lightbox');
-            document.getElementById('lightbox-img').src = src;
-            lb.classList.remove('hidden');
-            lb.classList.add('flex');
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox').classList.replace('flex', 'hidden');
-        }
-
 
 
 
@@ -644,26 +629,19 @@ setInterval(updateOnlineStatus, 120000);
     let currentLightboxIndex = 0;
 
     const GALLERY_CONFIG = {
-        folder: 'static/gallery/',
-        maxCheck: 50,
-        extensions: ['jpg', 'png', 'jpeg', 'webp']
+        folder: 'static/gallery/'
     };
 
     document.addEventListener('DOMContentLoaded', async () => {
         const track = document.getElementById('gallery-track');
         
-        // 1. ПОИСК ФАЙЛОВ
-        for (let i = 1; i <= GALLERY_CONFIG.maxCheck; i++) {
-            let found = false;
-            for (let ext of GALLERY_CONFIG.extensions) {
-                const src = `${GALLERY_CONFIG.folder}${i}.${ext}`;
-                if (await imageExists(src)) {
-                    galleryImages.push(src);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) break;
+        // 1. ЗАГРУЗКА СПИСКА ФАЙЛОВ С СЕРВЕРА
+        try {
+            const response = await fetch('/api/gallery');
+            const data = await response.json();
+            galleryImages = (data.images || []).map(name => GALLERY_CONFIG.folder + encodeURIComponent(name));
+        } catch (error) {
+            console.error('Ошибка загрузки галереи:', error);
         }
 
         // 2. ЗАПОЛНЕНИЕ ГАЛЕРЕИ
@@ -678,16 +656,6 @@ setInterval(updateOnlineStatus, 120000);
             while (track.children.length < 10 && galleryImages.length > 0) {
                 galleryImages.forEach((src, index) => createGalleryItem(src, index));
             }
-        }
-
-        // Вспомогательные функции
-        function imageExists(url) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
-                img.src = url;
-            });
         }
 
         function createGalleryItem(src, originalIndex) {

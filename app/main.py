@@ -1,4 +1,5 @@
 # app/main.py
+import os
 from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -30,6 +31,18 @@ async def get_server_status():
     """API для получения онлайна (вызывается из JS)"""
     status = await utils.get_minecraft_status()
     return status
+
+@app.get("/api/gallery")
+async def get_gallery():
+    """API для получения списка фото галереи"""
+    folder = "static/gallery"
+    if not os.path.isdir(folder):
+        return {"images": []}
+    files = sorted(
+        f for f in os.listdir(folder)
+        if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))
+    )
+    return {"images": files}
 
 # Пример работы с БД (на будущее)
 @app.post("/api/players/")
